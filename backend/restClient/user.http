@@ -1,0 +1,62 @@
+### Register a new user
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+### Login 
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+### Create a new user(ADMIN)
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "admin@example.com",
+  "password": "admin123",
+  "role": "ADMIN"
+}
+### Login as Admin
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+### Get all users 
+GET http://localhost:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNzU5OTcxYS0yOWQ5LTQ0NTAtOTI0OC0wZjEzMzUwNTU0MDYiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUwMTkzMzk1LCJleHAiOjE3NTAyNzk3OTV9.1BlRQ9YDYH1thozaOF-YXZ9pjhuJRjvDSG7FaW8XEUo
+
+### Get user profile 
+GET http://localhost:3000/users/profile
+Authorization: Bearer <token>
+
+### Get user by id 
+GET http://localhost:3000/users/<id>
+Authorization: Bearer <token>
+
+### Update user 
+PUT http://localhost:3000/users/<id>
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Updated Name"
+}
+
+### Delete user 
+DELETE http://localhost:3000/users/<id>
+Authorization: Bearer <token>

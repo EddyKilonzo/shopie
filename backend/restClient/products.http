@@ -1,0 +1,38 @@
+@baseUrl = http://localhost:3000
+
+### Create a new product (Admin only)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNzU5OTcxYS0yOWQ5LTQ0NTAtOTI0OC0wZjEzMzUwNTU0MDYiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUwMjYxNDc1LCJleHAiOjE3NTAzNDc4NzV9.l8lpSETIHWyLWIprjDGpKU9bQmbWLxNzN5UZE0Fjzv4
+
+{
+   "name": "iPhone 15 Pro",
+  "description": "Latest Apple iPhone with advanced camera system",
+  "price": 999.99,
+  "quantity": 50,
+  "imageUrl": "https://example.com/iphone15.jpg",
+  "stockQuantity": 50
+}
+
+### Get all products (public)
+GET {{baseUrl}}/products
+
+### Get a specific product (public)
+GET {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
+
+### Update a product (Admin only)
+PUT {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "name": "iPhone 15 Pro Max",
+  "description": "Latest Apple iPhone with advanced camera system and larger display",
+  "price": 1099.99,
+  "imageUrl": "https://example.com/iphone15promax.jpg",
+  "stockQuantity": 30
+}
+
+### Delete a product (Admin only)
+DELETE {{baseUrl}}/products/
+Authorization: Bearer <token>

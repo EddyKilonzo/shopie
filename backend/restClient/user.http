@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "name": "Test User",
-  "email": "testuser@example.com",
+  "email": "user@example.com",
   "password": "password123"
 }
 
@@ -13,7 +13,7 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "email": "testuser@example.com",
+  "email": "user@example.com",
   "password": "password123"
 }
 
@@ -38,7 +38,7 @@ Content-Type: application/json
 
 ### Get all users 
 GET http://localhost:3000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNzU5OTcxYS0yOWQ5LTQ0NTAtOTI0OC0wZjEzMzUwNTU0MDYiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUwMTkzMzk1LCJleHAiOjE3NTAyNzk3OTV9.1BlRQ9YDYH1thozaOF-YXZ9pjhuJRjvDSG7FaW8XEUo
+Authorization: Bearer <token>
 
 ### Get user profile 
 GET http://localhost:3000/users/profile
@@ -55,6 +55,14 @@ Content-Type: application/json
 
 {
   "name": "Updated Name"
+}
+### Update user password
+PUT http://localhost:3000/users/a17ea6b3-862b-4de2-bd17-fe55f5a24247/password
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "password": "12345678"
 }
 
 ### Delete user 

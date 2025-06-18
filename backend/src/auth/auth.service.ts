@@ -28,10 +28,7 @@ export class AuthService {
     }
   }
 
-  async login(
-    email: string,
-    password: string,
-  ): Promise<AuthResponse> {
+  async login(email: string, password: string): Promise<AuthResponse> {
     try {
       const user = await this.usersService.findByEmail(email);
       if (!user) {
@@ -61,9 +58,7 @@ export class AuthService {
     }
   }
 
-  async register(
-    user: CreateUserDto,
-  ): Promise<AuthResponse> {
+  async register(user: CreateUserDto): Promise<AuthResponse> {
     try {
       const existingUser = await this.usersService.findByEmail(user.email);
       if (existingUser) {

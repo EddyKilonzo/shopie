@@ -116,6 +116,61 @@ export class UsersController {
     }
   }
 
+  @Put('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update own profile' })
+  @ApiResponse({ status: 200, description: 'Profile successfully updated.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @HttpCode(HttpStatus.OK)
+  async updateProfile(
+    @Request() req: { user: { userId: string } },
+    @Body(new ValidationPipe({ transform: true })) updateUserDto: UpdateUserDto,
+  ): Promise<ApiResponse<User>> {
+    try {
+      const user = await this.usersService.update(
+        req.user.userId,
+        updateUserDto,
+      );
+      return {
+        success: true,
+        message: 'Profile updated successfully',
+        data: user,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error updating profile');
+    }
+  }
+
+  @Delete('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Delete own profile' })
+  @ApiResponse({ status: 200, description: 'Profile successfully deleted.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @HttpCode(HttpStatus.OK)
+  async deleteProfile(
+    @Request() req: { user: { userId: string } },
+  ): Promise<ApiResponse<void>> {
+    try {
+      await this.usersService.delete(req.user.userId);
+      return {
+        success: true,
+        message: 'Profile deleted successfully',
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error deleting profile');
+    }
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)

@@ -48,6 +48,8 @@ model Product {
 model Cart {
   id        String      @id @default(uuid())
   quantity  Int       
+  productName String
+  total     Decimal @default(0)
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   Product   Product  @relation(fields: [productId], references: [id])

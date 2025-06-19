@@ -1,0 +1,22 @@
+### Variables
+@baseUrl = http://localhost:3000
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMTdlYTZiMy04NjJiLTRkZTItYmQxNy1mZTU1ZjVhMjQyNDciLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3NTAyNzYxMDQsImV4cCI6MTc1MDM2MjUwNH0.D3P4noi2Oq2DJFBd1Phy4rMKyHwDvndXuviZK2ksYMA
+@productId = 32099f3a-be36-49af-9415-b88e2133f034
+
+### Add item to cart
+POST {{baseUrl}}/cart/add
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "productId": "{{productId}}",
+  "quantity": 2
+}
+
+### Get user cart
+GET {{baseUrl}}/cart
+Authorization: Bearer {{authToken}}
+
+### Remove item from cart
+DELETE {{baseUrl}}/cart/cart_item_id
+Authorization: Bearer {{authToken}} 

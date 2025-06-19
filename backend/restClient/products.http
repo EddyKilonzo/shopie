@@ -1,9 +1,11 @@
 @baseUrl = http://localhost:3000
 
+@token = 
+
 ### Create a new product (Admin only)
 POST {{baseUrl}}/products
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNzU5OTcxYS0yOWQ5LTQ0NTAtOTI0OC0wZjEzMzUwNTU0MDYiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUwMjYxNDc1LCJleHAiOjE3NTAzNDc4NzV9.l8lpSETIHWyLWIprjDGpKU9bQmbWLxNzN5UZE0Fjzv4
+Authorization: Bearer {{token}}
 
 {
    "name": "iPhone 15 Pro",
@@ -23,7 +25,7 @@ GET {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
 ### Update a product (Admin only)
 PUT {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
 Content-Type: application/json
-Authorization: Bearer <token>
+Authorization: Bearer {{token}}
 
 {
   "name": "iPhone 15 Pro Max",
@@ -35,4 +37,4 @@ Authorization: Bearer <token>
 
 ### Delete a product (Admin only)
 DELETE {{baseUrl}}/products/
-Authorization: Bearer <token>
+Authorization: Bearer {{token}}

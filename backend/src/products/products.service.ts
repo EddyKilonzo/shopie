@@ -7,6 +7,12 @@ import { Product } from 'generated/prisma';
 export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Creates a new product.
+   * @param createProductsDto - The data to create the product.
+   * @returns The created product.
+   */
+
   async create(createProductsDto: CreateProductsDto): Promise<Product> {
     try {
       const product = await this.prisma.product.create({
@@ -21,6 +27,10 @@ export class ProductsService {
     }
   }
 
+  /**
+   *
+   * @returns An array of all products.
+   */
   async findAll(): Promise<Product[]> {
     try {
       const products = await this.prisma.product.findMany();
@@ -33,6 +43,11 @@ export class ProductsService {
     }
   }
 
+  /**
+   *
+   * @param id - The ID of the product to find.
+   * @returns  The product with the specified ID.
+   */
   async findOne(id: string): Promise<Product> {
     try {
       const product = await this.prisma.product.findUnique({
@@ -49,6 +64,13 @@ export class ProductsService {
       throw new BadRequestException(`Failed to fetch product with id ${id}`);
     }
   }
+
+  /**
+   *
+   * @param id - The ID of the product to update.
+   * @param updateProductsDto - The data to update the product.
+   * @returns The updated product.
+   */
 
   async update(
     id: string,
@@ -68,6 +90,11 @@ export class ProductsService {
     }
   }
 
+  /**
+   * Deletes a product by its ID.
+   * @param id - The ID of the product to delete.
+   * @returns The deleted product.
+   */
   async delete(id: string): Promise<Product> {
     try {
       const product = await this.prisma.product.delete({
@@ -81,6 +108,13 @@ export class ProductsService {
       throw new BadRequestException(`Failed to delete product with id ${id}`);
     }
   }
+
+  /**
+   *
+   * @param name - The name of the product to search for.
+   * Searches for products by name.
+   * @returns An array of products matching the search criteria.
+   */
 
   async findByName(name: string): Promise<Product[]> {
     try {

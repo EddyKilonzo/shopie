@@ -7,6 +7,13 @@ import { Cart } from 'generated/prisma';
 export class CartService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Adds a product to the user's cart.
+   * @param userId - The ID of the user.
+   * @param addToCartDto - The data to add to the cart.
+   * @returns The updated cart item.
+   */
+
   async addToCart(userId: string, addToCartDto: AddToCartDto): Promise<Cart> {
     try {
       // Check if product exists and has enough stock
@@ -97,6 +104,11 @@ export class CartService {
     }
   }
 
+  /**
+   * Retrieves the user's cart items.
+   * @param userId - The ID of the user.
+   * @return An array of cart items.
+   */
   async getUserCart(userId: string): Promise<Cart[]> {
     try {
       const cartItems = await this.prisma.cart.findMany({
@@ -116,6 +128,10 @@ export class CartService {
       throw new BadRequestException('Error fetching cart');
     }
   }
+  /**
+   * @param userId - The ID of the user.
+   * @returns total price and item count of the user's cart.
+   */
 
   async getCartTotal(
     userId: string,
@@ -143,6 +159,12 @@ export class CartService {
       throw new BadRequestException('Error calculating cart total');
     }
   }
+
+  /**
+   * Removes an item from the user's cart.
+   * @param userId - The ID of the user.
+   * @param cartItemId
+   */
 
   async removeFromCart(userId: string, cartItemId: string): Promise<void> {
     try {

@@ -17,6 +17,12 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  /**
+   * Validates a user by email and password.
+   * @param email - The email of the user.
+   * @param password - The password of the user.
+   * @returns A message indicating the result of the validation.
+   */
   async validateUser(
     email: string,
     password: string,
@@ -32,6 +38,12 @@ export class AuthService {
     }
   }
 
+  /**
+   * Logs in a user.
+   * @param email - The email of the user.
+   * @param password - The password of the user.
+   * @returns The authentication response.
+   */
   async login(email: string, password: string): Promise<AuthResponse> {
     try {
       const user = await this.usersService.findByEmail(email);
@@ -62,6 +74,12 @@ export class AuthService {
     }
   }
 
+  /**
+   *registers a new user.
+   * @param user - The user data to register.
+   * @returns registed user
+   */
+
   async register(user: CreateUserDto): Promise<AuthResponse> {
     try {
       const existingUser = await this.usersService.findByEmail(user.email);
@@ -80,6 +98,12 @@ export class AuthService {
       return { message: 'Error registering user' };
     }
   }
+
+  /**
+   * Resets the password for a user.
+   * @param userId - The ID of the user whose password is to be reset.
+   * @param resetPasswordDto - The data transfer object containing the new password.
+   */
 
   async resetPassword(
     userId: string,

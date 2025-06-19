@@ -52,6 +52,11 @@ export class UsersService {
     };
   }
 
+  /**
+   * Hashes a password.
+   * @param password - The password to hash.
+   * @returns The hashed password.
+   */
   private async hashPassword(password: string): Promise<string> {
     try {
       const saltRounds = 10;
@@ -69,6 +74,12 @@ export class UsersService {
       throw new Error('Failed to hash password');
     }
   }
+
+  /**
+   * Creates a new user.
+   * @param data - The data to create the user.
+   * @returns The created user.
+   */
 
   async create(data: CreateUserDto): Promise<CreateUserResponse> {
     const existingUser = await this.prisma.user.findUnique({
@@ -112,6 +123,10 @@ export class UsersService {
     };
   }
 
+  /**
+   * Fetches all users.
+   * @returns An array of all users.
+   */
   async findAll(): Promise<User[]> {
     try {
       const users = await this.prisma.user.findMany({
@@ -128,6 +143,12 @@ export class UsersService {
       throw new Error('Unknown error fetching users');
     }
   }
+
+  /**
+   * Fetches users by role.
+   * @param role - The role to filter users by.
+   * @returns An array of users with the specified role.
+   */
 
   async findByRole(role: Role): Promise<User[]> {
     try {
@@ -149,6 +170,12 @@ export class UsersService {
     }
   }
 
+  /**
+   * Fetches a user by ID.
+   * @param id - The ID of the user to find.
+   * @returns The user with the specified ID.
+   */
+
   async findOne(id: string): Promise<User> {
     try {
       const user = await this.prisma.user.findUnique({
@@ -166,6 +193,12 @@ export class UsersService {
       throw new Error('Unknown error fetching user');
     }
   }
+
+  /**
+   * Fetches a user by email.
+   * @param email - The email of the user to find.
+   * @returns  The user with the specified email.
+   */
 
   async findByEmail(email: string): Promise<User> {
     try {
@@ -187,6 +220,13 @@ export class UsersService {
       throw new Error('Unknown error fetching user by email');
     }
   }
+
+  /**
+   * Updates a user.
+   * @param id - The ID of the user to update.
+   * @param data - The data to update the user.
+   * @returns The updated user.
+   */
 
   async update(id: string, data: UpdateUserDto): Promise<User> {
     try {
@@ -230,6 +270,12 @@ export class UsersService {
       throw new Error('Unknown error updating user');
     }
   }
+
+  /**
+   * Deletes a user by ID.
+   * @param id - The ID of the user to delete.
+   * @returns the message confirming deletion.
+   */
 
   async delete(id: string): Promise<{ message: string }> {
     try {

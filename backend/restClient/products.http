@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3000
 
-@token = 
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4ZjZlZDEwOS1jZmFlLTQwNDEtYWEyMi1lMWZmNTU2YjUzMTEiLCJlbWFpbCI6ImNlZUBleGFtcGxlLmNvbSIsInJvbGUiOiJDVVNUT01FUiIsImlhdCI6MTc1MDMzMjc3OCwiZXhwIjoxNzUwNDE5MTc4fQ.df-MGzZwUMXecl3znLUQUHequ0mZLzpXeoSQ_fxtDHU
 
 ### Create a new product (Admin only)
 POST {{baseUrl}}/products
@@ -19,6 +19,9 @@ Authorization: Bearer {{token}}
 ### Get all products (public)
 GET {{baseUrl}}/products
 
+### Get product by name (public)
+GET {{baseUrl}}/products?name=I
+
 ### Get a specific product (public)
 GET {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
 
@@ -36,5 +39,5 @@ Authorization: Bearer {{token}}
 }
 
 ### Delete a product (Admin only)
-DELETE {{baseUrl}}/products/
+DELETE {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
 Authorization: Bearer {{token}}

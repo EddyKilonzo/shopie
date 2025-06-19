@@ -11,9 +11,16 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  UseInterceptors,
+  UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
-import { CreateProductsDto } from './dto/create-products.dto';
+import {
+  CreateProductsDto,
+  ImageUploadResponseDto,
+} from './dto/create-products.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -23,8 +30,13 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { Product } from 'generated/prisma';
+import {
+  CloudinaryService,
+  ProductUploadType,
+} from '../common/cloudinary/cloudinary.service';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -36,7 +48,10 @@ interface ApiResponse<T> {
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -179,11 +194,142 @@ export class ProductsController {
         message: 'Products retrieved successfully',
         data: products,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         throw new BadRequestException(error.message);
       }
       throw new BadRequestException('Error retrieving products');
+    }
+  }
+
+  @Post('upload-image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiBearerAuth('JWT-auth')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload product image (Admin only)' })
+  @ApiResponse({
+    status: 201,
+    description: 'Image uploaded successfully.',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean' },
+        message: { type: 'string' },
+        data: {
+          type: 'object',
+          properties: {
+            publicId: { type: 'string' },
+            secureUrl: { type: 'string' },
+            url: { type: 'string' },
+            originalFilename: { type: 'string' },
+            bytes: { type: 'number' },
+            format: { type: 'string' },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @HttpCode(HttpStatus.CREATED)
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<ApiResponse<ImageUploadResponseDto>> {
+    try {
+      const result = await this.cloudinaryService.uploadFile(
+        file,
+        ProductUploadType.PRODUCT_IMAGE,
+      );
+      return {
+        success: true,
+        message: 'Image uploaded successfully',
+        data: {
+          publicId: result.public_id,
+          secureUrl: result.secure_url,
+          url: result.url,
+          originalFilename: result.original_filename,
+          bytes: result.bytes,
+          format: result.format,
+        },
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error uploading image');
+    }
+  }
+
+  @Post('upload-gallery')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(FilesInterceptor('images', 10)) // Max 10 images
+  @ApiBearerAuth('JWT-auth')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload product gallery images (Admin only)' })
+  @ApiResponse({
+    status: 201,
+    description: 'Images uploaded successfully.',
+    type: [ImageUploadResponseDto],
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @HttpCode(HttpStatus.CREATED)
+  async uploadGallery(
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<ApiResponse<ImageUploadResponseDto[]>> {
+    try {
+      const results = await this.cloudinaryService.uploadMultipleFiles(
+        files,
+        ProductUploadType.PRODUCT_GALLERY,
+      );
+      return {
+        success: true,
+        message: 'Gallery images uploaded successfully',
+        data: results.map((result) => ({
+          publicId: result.public_id,
+          secureUrl: result.secure_url,
+          url: result.url,
+          originalFilename: result.original_filename,
+          bytes: result.bytes,
+          format: result.format,
+        })),
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error uploading gallery images');
+    }
+  }
+
+  @Delete('image/:publicId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Delete product image (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Image deleted successfully.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @HttpCode(HttpStatus.OK)
+  async deleteImage(@Param('publicId') publicId: string) {
+    try {
+      const result = await this.cloudinaryService.deleteFile(publicId);
+      return {
+        success: true,
+        message: 'Image deleted successfully',
+        data: result,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error deleting image');
     }
   }
 }

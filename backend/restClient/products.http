@@ -1,43 +1,61 @@
 @baseUrl = http://localhost:3000
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4ZjZlZDEwOS1jZmFlLTQwNDEtYWEyMi1lMWZmNTU2YjUzMTEiLCJlbWFpbCI6ImNlZUBleGFtcGxlLmNvbSIsInJvbGUiOiJDVVNUT01FUiIsImlhdCI6MTc1MDMzMjc3OCwiZXhwIjoxNzUwNDE5MTc4fQ.df-MGzZwUMXecl3znLUQUHequ0mZLzpXeoSQ_fxtDHU
 
-### Create a new product (Admin only)
-POST {{baseUrl}}/products
+### Login as Admin 
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
-   "name": "iPhone 15 Pro",
-  "description": "Latest Apple iPhone with advanced camera system",
-  "price": 999.99,
-  "quantity": 50,
-  "imageUrl": "https://example.com/iphone15.jpg",
-  "stockQuantity": 50
+  "email": "admin@example.com",
+  "password": "admin123"
 }
 
-### Get all products (public)
+###  JWT Token 
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwNjY5YTEyYi0yZTA4LTRjOWQtODljZi0wNTc5YzMwOTU2MTAiLCJlbWFpbCI6ImRlZUBleGFtcGxlLmNvbSIsInJvbGUiOiJDVVNUT01FUiIsImlhdCI6MTc1MDM1NTI2NiwiZXhwIjoxNzUwNDQxNjY2fQ.wyIBLssQra7pYv-wziDEZRSZnI8iYqEwTLw6VNcIGvU
+
+
+### Upload  Product Image 
+POST {{baseUrl}}/products/upload-image
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="product-image.jpg"
+Content-Type: image/jpg
+
+< ./product-image.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###  Image URL 
+@imageUrl = https://res.cloudinary.com/duymwzfhj/image/upload/v1750354853/shopie/products/images/file_bfkc01.jpg
+@productId = ee99b449-db97-4bce-877c-267b0ce8203a
+
+
+
+### Creating Product with Uploaded Image
+POST {{baseUrl}}/products
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "IPhone 13 Pro ",
+  "description": "A test product with uploaded image",
+  "price": 1900.99,
+  "imageUrl": "{{imageUrl}}",
+  "stockQuantity": 100
+}
+
+### Get All Products
 GET {{baseUrl}}/products
 
-### Get product by name (public)
-GET {{baseUrl}}/products?name=I
+### Get  Product by ID
+GET {{baseUrl}}/products/{{productId}}
 
-### Get a specific product (public)
-GET {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
 
-### Update a product (Admin only)
-PUT {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
-Content-Type: application/json
-Authorization: Bearer {{token}}
+### Delete Product
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{authToken}}
 
-{
-  "name": "iPhone 15 Pro Max",
-  "description": "Latest Apple iPhone with advanced camera system and larger display",
-  "price": 1099.99,
-  "imageUrl": "https://example.com/iphone15promax.jpg",
-  "stockQuantity": 30
-}
-
-### Delete a product (Admin only)
-DELETE {{baseUrl}}/products/32099f3a-be36-49af-9415-b88e2133f034
-Authorization: Bearer {{token}}
+### Delete Image from Cloudinary
+DELETE {{baseUrl}}/products/image/{{productId}}
+Authorization: Bearer {{authToken}}

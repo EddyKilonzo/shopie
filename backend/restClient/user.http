@@ -1,17 +1,17 @@
 @baseUrl = http://localhost:3000
 
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNzU5OTcxYS0yOWQ5LTQ0NTAtOTI0OC0wZjEzMzUwNTU0MDYiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUwMzI0NjA1LCJleHAiOjE3NTA0MTEwMDV9.7xU5bKirgo2TljjnWoQdhljd3NJGHVOyoJr33w7L-8s
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwNjY5YTEyYi0yZTA4LTRjOWQtODljZi0wNTc5YzMwOTU2MTAiLCJlbWFpbCI6ImRlZUBleGFtcGxlLmNvbSIsInJvbGUiOiJDVVNUT01FUiIsImlhdCI6MTc1MDM1NTI0NiwiZXhwIjoxNzUwNDQxNjQ2fQ.EChc5JH5PB6YDfjKspbvmYBFVwOx9cJeZB1ks33tJMY
 
-@id = a6da87f4-afb2-49a5-852e-ae7b7377fbbf
+@id = 0669a12b-2e08-4c9d-89cf-0579c3095610
 
 ### Register a new user
 POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-  "name": "Cee ",
-  "email": "cee@example.com",
-  "password": "cee@example.com"
+  "name": "dee ",
+  "email": "dee@example.com",
+  "password": "dee@example.com"
 }
 
 ### Login
@@ -19,8 +19,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "cee@example.com",
-  "password": "cee@example.com"
+  "email": "dee@example.com",
+  "password": "dee@example.com"
 }
 
 ### Create a new user(ADMIN)

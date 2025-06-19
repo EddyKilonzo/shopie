@@ -1,7 +1,10 @@
 ### Variables
 @baseUrl = http://localhost:3000
-@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMTdlYTZiMy04NjJiLTRkZTItYmQxNy1mZTU1ZjVhMjQyNDciLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3NTAyNzYxMDQsImV4cCI6MTc1MDM2MjUwNH0.D3P4noi2Oq2DJFBd1Phy4rMKyHwDvndXuviZK2ksYMA
-@productId = 32099f3a-be36-49af-9415-b88e2133f034
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwNjY5YTEyYi0yZTA4LTRjOWQtODljZi0wNTc5YzMwOTU2MTAiLCJlbWFpbCI6ImRlZUBleGFtcGxlLmNvbSIsInJvbGUiOiJDVVNUT01FUiIsImlhdCI6MTc1MDM1NTI2NiwiZXhwIjoxNzUwNDQxNjY2fQ.wyIBLssQra7pYv-wziDEZRSZnI8iYqEwTLw6VNcIGvU
+@productId = aff2c450-a00d-41ae-ad7c-6cc7f7abadfe
+
+## Get all products
+GET {{baseUrl}}/products
 
 ### Add item to cart
 POST {{baseUrl}}/cart/add
@@ -10,7 +13,7 @@ Authorization: Bearer {{authToken}}
 
 {
   "productId": "{{productId}}",
-  "quantity": 2
+  "quantity": 10
 }
 
 ### Get user cart

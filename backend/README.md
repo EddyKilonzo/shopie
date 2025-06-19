@@ -21,40 +21,108 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+# Shopie Backend
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A NestJS backend application for the Shopie e-commerce platform.
 
-## Project setup
+## Features
 
-```bash
-$ npm install
+- User authentication and authorization
+- Product management with image uploads
+- Shopping cart functionality
+- Role-based access control (Admin/Customer)
+
+## Image Upload Features
+
+The application now supports image uploads for products using Cloudinary:
+
+### Product Image Upload
+- **Endpoint**: `POST /products/upload-image`
+- **Authentication**: Required (Admin only)
+- **Content-Type**: `multipart/form-data`
+- **Field Name**: `image`
+- **Max File Size**: 5MB
+- **Allowed Formats**: jpg, jpeg, png, webp
+- **Response**: Returns Cloudinary upload details including secure URL
+
+### Product Gallery Upload
+- **Endpoint**: `POST /products/upload-gallery`
+- **Authentication**: Required (Admin only)
+- **Content-Type**: `multipart/form-data`
+- **Field Name**: `images`
+- **Max Files**: 10 images
+- **Max File Size**: 8MB per image
+- **Allowed Formats**: jpg, jpeg, png, webp
+- **Response**: Returns array of Cloudinary upload details
+
+### Delete Image
+- **Endpoint**: `DELETE /products/image/:publicId`
+- **Authentication**: Required (Admin only)
+- **Response**: Confirmation of deletion
+
+## Environment Variables
+
+Make sure to set up the following environment variables for Cloudinary:
+
+```env
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-## Compile and run the project
+## Usage Examples
+
+### Upload a Product Image
+```bash
+curl -X POST http://localhost:3000/products/upload-image \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "image=@product.jpg"
+```
+
+### Create Product with Image
+```bash
+curl -X POST http://localhost:3000/products \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Product Name",
+    "description": "Product description",
+    "price": 29.99,
+    "imageUrl": "https://res.cloudinary.com/your-cloud/image/upload/v123/product.jpg",
+    "stockQuantity": 100
+  }'
+```
+
+## Installation
+
+```bash
+npm install
+```
+
+## Running the app
 
 ```bash
 # development
-$ npm run start
+npm run start
 
 # watch mode
-$ npm run start:dev
+npm run start:dev
 
 # production mode
-$ npm run start:prod
+npm run start:prod
 ```
 
-## Run tests
+## Test
 
 ```bash
 # unit tests
-$ npm run test
+npm run test
 
 # e2e tests
-$ npm run test:e2e
+npm run test:e2e
 
 # test coverage
-$ npm run test:cov
+npm run test:cov
 ```
 
 ## Deployment

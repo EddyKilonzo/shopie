@@ -15,8 +15,13 @@ export class ProductsService {
 
   async create(createProductsDto: CreateProductsDto): Promise<Product> {
     try {
+      const productData = {
+        ...createProductsDto,
+        imageUrl: createProductsDto.imageUrl || '', // Provide default empty string if imageUrl is undefined
+      };
+      
       const product = await this.prisma.product.create({
-        data: createProductsDto,
+        data: productData,
       });
       return product;
     } catch (error: unknown) {
@@ -77,9 +82,14 @@ export class ProductsService {
     updateProductsDto: CreateProductsDto,
   ): Promise<Product> {
     try {
+      const productData = {
+        ...updateProductsDto,
+        imageUrl: updateProductsDto.imageUrl || '', // Provide default empty string if imageUrl is undefined
+      };
+      
       const product = await this.prisma.product.update({
         where: { id },
-        data: updateProductsDto,
+        data: productData,
       });
       return product;
     } catch (error: unknown) {
@@ -127,7 +137,7 @@ export class ProductsService {
         },
       });
       return products;
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         throw new BadRequestException(error.message);
       }

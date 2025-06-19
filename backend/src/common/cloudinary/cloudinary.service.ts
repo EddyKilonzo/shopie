@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { Express } from 'express';
 
 /**
@@ -222,13 +226,36 @@ export class CloudinaryService {
       };
 
       cloudinary.uploader
-        .upload_stream(uploadOptions, (error, result) => {
-          if (error) {
-            reject(new BadRequestException(`Upload failed: ${error.message}`));
-          } else {
-            resolve(result as CloudinaryUploadResult);
-          }
-        })
+        .upload_stream(
+          uploadOptions,
+          (error, result: UploadApiResponse | undefined) => {
+            if (error) {
+              reject(
+                new BadRequestException(`Upload failed: ${error.message}`),
+              );
+            } else if (result) {
+              // Transform UploadApiResponse to CloudinaryUploadResult
+              const uploadResult: CloudinaryUploadResult = {
+                public_id: result.public_id,
+                secure_url: result.secure_url,
+                url: result.url,
+                original_filename: result.original_filename,
+                bytes: result.bytes,
+                format: result.format,
+                resource_type: result.resource_type,
+                created_at: result.created_at,
+                width: result.width,
+                height: result.height,
+                folder: config.folder,
+              };
+              resolve(uploadResult);
+            } else {
+              reject(
+                new BadRequestException('Upload failed: No result returned'),
+              );
+            }
+          },
+        )
         .end(file.buffer);
     });
   }
@@ -257,33 +284,46 @@ export class CloudinaryService {
         result: string;
       };
       return result;
-    } catch (error: any) {
-      throw new BadRequestException(`Failed to delete file: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new BadRequestException(`Failed to delete file: ${errorMessage}`);
     }
-  } /**
+  }
+
+  /**
    * Delete multiple files from Cloudinary
    */
   async deleteMultipleFiles(
     publicIds: string[],
   ): Promise<{ deleted: Record<string, string> }> {
     try {
-      const result = await cloudinary.api.delete_resources(publicIds);
+      const result = (await cloudinary.api.delete_resources(publicIds)) as {
+        deleted: Record<string, string>;
+      };
       return result;
-    } catch (error) {
-      throw new BadRequestException(`Failed to delete files: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new BadRequestException(`Failed to delete files: ${errorMessage}`);
     }
   }
 
   /**
    * Get file details from Cloudinary
    */
-  async getFileDetails(publicId: string): Promise<any> {
+  async getFileDetails(publicId: string): Promise<Record<string, unknown>> {
     try {
-      const result = (await cloudinary.api.resource(publicId)) as any;
+      const result = (await cloudinary.api.resource(publicId)) as Record<
+        string,
+        unknown
+      >;
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new BadRequestException(
-        `Failed to get file details: ${error.message}`,
+        `Failed to get file details: ${errorMessage}`,
       );
     }
   }
@@ -291,7 +331,10 @@ export class CloudinaryService {
   /**
    * Generate transformation URL for existing image
    */
-  generateTransformationUrl(publicId: string, transformations: any): string {
+  generateTransformationUrl(
+    publicId: string,
+    transformations: Record<string, unknown>,
+  ): string {
     return cloudinary.url(publicId, transformations);
   }
 
@@ -314,20 +357,23 @@ export class CloudinaryService {
    */
   async createArchive(publicIds: string[]): Promise<string> {
     try {
-      const result = await cloudinary.uploader.create_archive({
+      const result = (await cloudinary.uploader.create_archive({
         resource_type: 'image',
         type: 'upload',
         target_format: 'zip',
         public_ids: publicIds,
         use_original_filename: true,
-      }) as { secure_url: string };
+      })) as { secure_url: string };
       return result.secure_url;
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new BadRequestException(
-        `Failed to create archive: ${error.message}`,
+        `Failed to create archive: ${errorMessage}`,
       );
     }
   }
+
   /**
    * Extract public ID from Cloudinary URL
    */

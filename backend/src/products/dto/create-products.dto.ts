@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, Min, IsOptional, IsUrl } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateProductsDto {
@@ -20,14 +20,35 @@ export class CreateProductsDto {
   @Min(0)
   price: number;
 
-  @ApiProperty()
-  @IsNotEmpty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  imageUrl: string;
+  @IsUrl()
+  imageUrl?: string;
 
   @ApiProperty({ default: 0 })
   @Type(() => Number)
   @IsNumber()
   @Min(0)
   stockQuantity: number;
+}
+
+export class ImageUploadResponseDto {
+  @ApiProperty()
+  publicId: string;
+
+  @ApiProperty()
+  secureUrl: string;
+
+  @ApiProperty()
+  url: string;
+
+  @ApiProperty()
+  originalFilename: string;
+
+  @ApiProperty()
+  bytes: number;
+
+  @ApiProperty()
+  format: string;
 }

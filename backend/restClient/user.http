@@ -1,15 +1,17 @@
 @baseUrl = http://localhost:3000
 
-@token =
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNzU5OTcxYS0yOWQ5LTQ0NTAtOTI0OC0wZjEzMzUwNTU0MDYiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUwMzI0NjA1LCJleHAiOjE3NTA0MTEwMDV9.7xU5bKirgo2TljjnWoQdhljd3NJGHVOyoJr33w7L-8s
+
+@id = a6da87f4-afb2-49a5-852e-ae7b7377fbbf
 
 ### Register a new user
 POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-  "name": "Test User",
-  "email": "user@example.com",
-  "password": "password123"
+  "name": "Eddy Ma",
+  "email": "eddy@example.com",
+  "password": "eddy@example.com"
 }
 
 ### Login
@@ -17,8 +19,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
-  "password": "password123"
+  "email": "eddy@example.com",
+  "password": "eddy@example.com"
 }
 
 ### Create a new user(ADMIN)
@@ -31,6 +33,7 @@ Content-Type: application/json
   "password": "admin123",
   "role": "ADMIN"
 }
+
 ### Login as Admin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
@@ -40,35 +43,42 @@ Content-Type: application/json
   "password": "admin123"
 }
 
-### Get all users
+### Get all users (Admin only)
 GET {{baseUrl}}/users
 Authorization: Bearer {{token}}
 
-### Get user profile
+### Get user profile (own profile only)
 GET {{baseUrl}}/users/profile
 Authorization: Bearer {{token}}
 
-### Get user by id
-GET {{baseUrl}}/users/<id>
+### Get user by id (Admin only)
+GET {{baseUrl}}/users/{{id}}
 Authorization: Bearer {{token}}
 
-### Update user
-PUT {{baseUrl}}/users/<id>
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "name": "Updated Name"
-}
-### Update user password
-PUT {{baseUrl}}/users/<id>/password
+### Update own profile (only name and email)
+PUT {{baseUrl}}/users/profile
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "password": "12345678"
+  "name": "Eddy Max Kilonzo",
+  "email": "eddy.new@example.com"
 }
 
-### Delete user
-DELETE {{baseUrl}}/users/<id>
+### Reset password (secure - only own password)
+POST {{baseUrl}}/auth/reset-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "eddy@example.com",
+  "newPassword": "12345678"
+}
+
+### Delete own profile
+DELETE {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+
+### Delete user (Admin only)
+DELETE {{baseUrl}}/users/{{id}}
 Authorization: Bearer {{token}}

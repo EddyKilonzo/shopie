@@ -1,10 +1,14 @@
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './../users/users.service';
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/users/dto/create.user.dto';
-import { User } from '../users/interfaces/user.interface';
 import { AuthResponse } from './interfaces/auth-response.interface';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -78,31 +82,46 @@ export class AuthService {
   }
 
   async resetPassword(
-    email: string,
-    currentPassword: string,
-    newPassword: string,
+    userId: string,
+    resetPasswordDto: ResetPasswordDto,
   ): Promise<{ message: string }> {
     try {
-      const user = await this.usersService.findByEmail(email);
+      // Get the user
+      const user = await this.usersService.findOne(userId);
       if (!user) {
-        return { message: 'User not found' };
+        throw new NotFoundException('User not found');
       }
 
-      const isPasswordValid = await bcrypt.compare(
-        currentPassword,
+      // Verify current password
+      const isCurrentPasswordValid = await bcrypt.compare(
+        resetPasswordDto.currentPassword,
         user.password,
       );
-      if (!isPasswordValid) {
-        return { message: 'Invalid current password' };
+      if (!isCurrentPasswordValid) {
+        throw new BadRequestException('Current password is incorrect');
       }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await this.usersService.update(user.id, { password: hashedPassword });
+      // Hash the new password
+      const hashedNewPassword = await bcrypt.hash(
+        resetPasswordDto.newPassword,
+        10,
+      );
+
+      // Update the password
+      await this.usersService.update(user.id, {
+        password: hashedNewPassword,
+      });
 
       return { message: 'Password reset successfully' };
     } catch (error) {
-      console.error('Error resetting password:', error);
-      return { message: 'Error resetting password' };
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+      console.error(`Error resetting password for user ${userId}:`, error);
+      throw new Error('Error resetting password');
     }
   }
 }

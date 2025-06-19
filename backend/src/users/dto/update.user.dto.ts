@@ -1,12 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  MinLength,
-  IsOptional,
-  IsEnum,
-} from 'class-validator';
-import { Role } from './create.user.dto';
+import { IsEmail, IsString, IsOptional, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -16,10 +8,6 @@ export class UpdateUserDto {
   @IsOptional()
   @IsEmail()
   email?: string;
-
-  @IsOptional()
-  @IsEnum(['ADMIN', 'CUSTOMER'])
-  role?: Role;
 
   @IsOptional()
   @IsString()

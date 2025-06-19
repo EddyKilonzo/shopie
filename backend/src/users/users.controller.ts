@@ -197,35 +197,6 @@ export class UsersController {
     }
   }
 
-  @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Update user (Admin only)' })
-  @ApiResponse({ status: 200, description: 'User successfully updated.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  @HttpCode(HttpStatus.OK)
-  async update(
-    @Param('id') id: string,
-    @Body(new ValidationPipe({ transform: true })) updateUserDto: UpdateUserDto,
-  ): Promise<ApiResponse<User>> {
-    try {
-      const user = await this.usersService.update(id, updateUserDto);
-      return {
-        success: true,
-        message: 'User updated successfully',
-        data: user,
-      };
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new BadRequestException(error.message);
-      }
-      throw new BadRequestException('Error updating user');
-    }
-  }
-
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)

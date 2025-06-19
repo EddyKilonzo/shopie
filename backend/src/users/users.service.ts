@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create.user.dto';
@@ -208,22 +209,9 @@ export class UsersService {
         }
       }
 
-      let hashedPassword: string | undefined;
-      if (typeof data.password === 'string') {
-        hashedPassword = await this.hashPassword(data.password);
-      }
-
       const updateData: Partial<User> = {};
       if (typeof data.name === 'string') updateData.name = data.name;
       if (typeof data.email === 'string') updateData.email = data.email;
-      if (typeof hashedPassword === 'string')
-        updateData.password = hashedPassword;
-
-      if (
-        typeof data.role === 'string' &&
-        Object.values(Role).includes(data.role as Role)
-      )
-        updateData.role = data.role as Role;
 
       const updatedUser = await this.prisma.user.update({
         where: { id },
@@ -243,6 +231,7 @@ export class UsersService {
       throw new Error('Unknown error updating user');
     }
   }
+
   async delete(id: string): Promise<{ message: string }> {
     try {
       const user = await this.prisma.user.findUnique({

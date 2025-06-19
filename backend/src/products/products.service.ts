@@ -17,9 +17,9 @@ export class ProductsService {
     try {
       const productData = {
         ...createProductsDto,
-        imageUrl: createProductsDto.imageUrl || '', // Provide default empty string if imageUrl is undefined
+        imageUrl: createProductsDto.imageUrl || '', // default is empty string if imageUrl is undefined
       };
-      
+
       const product = await this.prisma.product.create({
         data: productData,
       });
@@ -86,7 +86,7 @@ export class ProductsService {
         ...updateProductsDto,
         imageUrl: updateProductsDto.imageUrl || '', // Provide default empty string if imageUrl is undefined
       };
-      
+
       const product = await this.prisma.product.update({
         where: { id },
         data: productData,

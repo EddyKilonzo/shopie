@@ -19,8 +19,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
-  "password": ""
+  "email": "cee@example.com",
+  "password": "cee@example.com"
 }
 
 ### Create a new user(ADMIN)

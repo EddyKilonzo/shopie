@@ -163,4 +163,27 @@ export class ProductsController {
       throw new BadRequestException('Error deleting product');
     }
   }
+
+  @Get('search/:query')
+  @ApiOperation({ summary: 'Search products (Public)' })
+  @ApiResponse({ status: 200, description: 'Return products by query.' })
+  @HttpCode(HttpStatus.OK)
+  async search(@Param('query') query: string): Promise<ApiResponse<Product[]>> {
+    try {
+      const products = await this.productsService.findByName(query);
+      if (!products || !Array.isArray(products)) {
+        throw new BadRequestException('Invalid search results');
+      }
+      return {
+        success: true,
+        message: 'Products retrieved successfully',
+        data: products,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error retrieving products');
+    }
+  }
 }

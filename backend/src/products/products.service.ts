@@ -81,4 +81,25 @@ export class ProductsService {
       throw new BadRequestException(`Failed to delete product with id ${id}`);
     }
   }
+
+  async findByName(name: string): Promise<Product[]> {
+    try {
+      const products = await this.prisma.product.findMany({
+        where: {
+          name: {
+            contains: name,
+            mode: 'insensitive',
+          },
+        },
+      });
+      return products;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException(
+        `Failed to fetch products with name ${name}`,
+      );
+    }
+  }
 }

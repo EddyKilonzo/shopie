@@ -154,10 +154,9 @@ curl -X POST http://localhost:3000/auth/reset-password \
 
 ### Users (`/users`)
 
-#### Create User (Admin)
+#### Create User 
 - **POST** `/users`
-- **Description**: Create a new user (Admin only)
-- **Authentication**: Required (Admin)
+- **Description**: Create a new user 
 - **Request Body**: Same as register
 - **Response**: Same as register
 

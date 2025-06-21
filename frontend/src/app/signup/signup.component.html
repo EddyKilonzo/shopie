@@ -1,0 +1,53 @@
+<div class="signup">
+    <div class="signup-form">
+        <div class="left">
+            <h1>Shopie</h1>
+            <p class="brand-description">Your trusted online shopping destination for quality products and exceptional service.</p>
+            <img src="" alt="">
+        </div>
+        <div class="right">
+            <div class="logo-section">
+                <h2>Create an Account</h2>
+            </div>
+
+            <form (ngSubmit)="onSubmit()" #signupForm="ngForm">
+                <div class="form-group">
+                    <label for="Name">Name:</label>
+                    <input type="text" id="name" name="name" [(ngModel)]="signupData.name" placeholder="John Doe...">
+
+                    <label for="Email">Email:</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        [(ngModel)]="signupData.email" 
+                        required 
+                        placeholder="JohnDoe@gmail.com">
+
+                    <label for="password">Password:</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        [(ngModel)]="signupData.password" 
+                        required 
+                        placeholder="Enter your password">
+
+                    <button type="submit" class="btn" [disabled]="isLoading"> 
+                        {{ isLoading? 'Creating Account...' : 'Sign Up' }}
+                    </button>
+                </div>
+            </form>
+            <div class="message">
+                <div *ngIf="successMessage" class="error-message">
+                    {{ successMessage }}
+                </div>
+                <div *ngIf="errorMessage" class="error-message">
+                    {{ errorMessage }}
+                </div>
+
+            </div>
+            <p>Already have an account? <a routerLink="/login">Login here</a></p>
+        </div>    
+    </div>
+</div>

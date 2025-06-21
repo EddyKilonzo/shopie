@@ -1,0 +1,93 @@
+<div class="products-page">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <h1>Shopie</h1>
+      </div>
+      <div class="search-bar">
+        <input 
+          type="text" 
+          placeholder="Search products..." 
+          [(ngModel)]="searchTerm"
+          class="search-input">
+      </div>
+      <div class="user-actions">
+        <div class="welcome-message" *ngIf="currentUser">
+          Welcome, {{ currentUser.name }}!
+        </div>
+        <button class="cart-btn" routerLink="/cart">
+          🛒 Cart
+          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </button>
+        <button class="logout-btn" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading products...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!isLoading && filteredProducts.length > 0" class="products-grid">
+      <div *ngFor="let product of filteredProducts" class="product-card">
+        <div class="product-image">
+          <img [src]="getProductImage(product)" [alt]="product.name">
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-description">{{ product.description }}</p>
+          <div class="product-meta">
+            <span class="product-stock" [class.low-stock]="isLowStock(product)">
+              {{ getStockStatus(product) }}
+            </span>
+          </div>
+          <div class="product-price">
+            <span class="price">${{ product.price | number:'1.2-2' }}</span>
+          </div>
+          <div class="quantity-selector">
+            <button class="qty-btn" (click)="quantities[product.id] = Math.max(1, (quantities[product.id] || 1) - 1)" [disabled]="addingToCart[product.id] || (quantities[product.id] || 1) <= 1">-</button>
+            <input type="number" min="1" [max]="product.stockQuantity" [(ngModel)]="quantities[product.id]" [value]="quantities[product.id] || 1" [disabled]="addingToCart[product.id]" class="qty-input">
+            <button class="qty-btn" (click)="quantities[product.id] = Math.min(product.stockQuantity, (quantities[product.id] || 1) + 1)" [disabled]="addingToCart[product.id] || (quantities[product.id] || 1) >= product.stockQuantity">+</button>
+            <span class="qty-stock">/ {{ product.stockQuantity }}</span>
+          </div>
+          <button 
+            class="add-to-cart-btn" 
+            (click)="addToCart(product)"
+            [disabled]="product.stockQuantity === 0 || addingToCart[product.id]">
+            <span *ngIf="addingToCart[product.id]">Adding...</span>
+            <span *ngIf="!addingToCart[product.id]">
+              {{ product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Products Found -->
+    <div *ngIf="!isLoading && filteredProducts.length === 0 && products.length > 0" class="no-products">
+      <p>No products found matching your search criteria.</p>
+      <button (click)="searchTerm = ''" class="clear-filters-btn">
+        Clear Search
+      </button>
+    </div>
+
+    <!-- No Products Available -->
+    <div *ngIf="!isLoading && products.length === 0" class="no-products">
+      <p>No products available at the moment.</p>
+      <p>Please check back later or contact an administrator to add products.</p>
+    </div>
+  </main>
+</div> 

@@ -1,0 +1,65 @@
+<div class="cart-page">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <h1>Your Cart</h1>
+      </div>
+      <div class="user-actions">
+        <button class="back-btn" routerLink="/products">
+          ← Back to Products
+        </button>
+        <button class="logout-btn" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading cart...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Cart Items -->
+    <div *ngIf="!isLoading && cartItems.length > 0" class="cart-items">
+      <div *ngFor="let item of cartItems" class="cart-item">
+        <div class="item-info">
+          <h3>{{ item.productName }}</h3>
+          <p>Quantity: {{ item.quantity }}</p>
+          <p class="item-total">Total: ${{ item.total | number:'1.2-2' }}</p>
+        </div>
+        <div class="item-actions">
+          <button class="remove-btn" (click)="removeFromCart(item.id)">
+            Remove
+          </button>
+        </div>
+      </div>
+      
+      <div class="cart-summary">
+        <h3>Cart Total: ${{ cartTotal | number:'1.2-2' }}</h3>
+        <p>Total Items: {{ totalItems }}</p>
+        <button class="checkout-btn">
+          Proceed to Checkout
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty Cart -->
+    <div *ngIf="!isLoading && cartItems.length === 0" class="empty-cart">
+      <h2>Your cart is empty</h2>
+      <p>Add some products to your cart to get started!</p>
+      <button class="shop-btn" routerLink="/products">
+        Continue Shopping
+      </button>
+    </div>
+  </main>
+</div> 

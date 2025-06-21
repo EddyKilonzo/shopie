@@ -12,6 +12,9 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
+  signup(signupData: { email: string; password: string; name: string; }) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -82,9 +85,15 @@ export class AuthService {
 
   async register(user: CreateUserDto): Promise<AuthResponse> {
     try {
-      const existingUser = await this.usersService.findByEmail(user.email);
-      if (existingUser) {
-        return { message: 'User already exists' };
+      // Check if user already exists
+      try {
+        const existingUser = await this.usersService.findByEmail(user.email);
+        if (existingUser) {
+          return { message: 'User already exists' };
+        }
+      } catch (error) {
+        console.error('Error checking existing user:', error);
+        return { message: 'Error checking existing user' };
       }
 
       const result = await this.usersService.create(user);

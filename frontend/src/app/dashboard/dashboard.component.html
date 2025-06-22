@@ -1,1 +1,221 @@
-<p>dashboard works!</p>
+<div class="admin-dashboard">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <h1>Shopie Admin</h1>
+        <div class="welcome-section" *ngIf="currentUser">
+          <div class="welcome-message">
+            Welcome, {{ currentUser.name }}! (Admin)
+          </div>
+        </div>
+      </div>
+      
+      <div class="user-actions">
+        <button class="nav-btn" (click)="navigateToProducts()">
+          🛍️ View Store
+        </button>
+        <button class="logout-btn" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Dashboard Stats -->
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <h3>Total Products</h3>
+        <p class="stat-number">{{ totalProducts }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Low Stock Items</h3>
+        <p class="stat-number">{{ lowStockItems }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Out of Stock</h3>
+        <p class="stat-number">{{ outOfStockItems }}</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="add-product-btn" (click)="showAddProductForm()">
+        ➕ Add New Product
+      </button>
+      <button class="refresh-btn" (click)="loadProducts()">
+        🔄 Refresh Products
+      </button>
+    </div>
+
+    <!-- Add/Edit Product Form -->
+    <div *ngIf="showAddForm" class="product-form-overlay">
+      <div class="product-form">
+        <div class="form-header">
+          <h2>{{ editingProduct ? 'Edit Product' : 'Add New Product' }}</h2>
+          <button class="close-btn" (click)="cancelForm()">✕</button>
+        </div>
+        
+        <form (ngSubmit)="editingProduct ? updateProduct() : addProduct()">
+          <div class="form-group">
+            <label for="name">Product Name *</label>
+            <input 
+              type="text" 
+              id="name"
+              [(ngModel)]="formData.name"
+              name="name"
+              required
+              placeholder="Enter product name">
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea 
+              id="description"
+              [(ngModel)]="formData.description"
+              name="description"
+              required
+              placeholder="Enter product description"
+              rows="3"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="price">Price *</label>
+              <input 
+                type="number" 
+                id="price"
+                [(ngModel)]="formData.price"
+                name="price"
+                min="0"
+                step="0.01"
+                required
+                placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+              <label for="stock">Stock Quantity *</label>
+              <input 
+                type="number" 
+                id="stock"
+                [(ngModel)]="formData.stockQuantity"
+                name="stockQuantity"
+                min="0"
+                required
+                placeholder="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="imageUrl">Product Image</label>
+            <div class="image-upload-section">
+              <!-- File Input -->
+              <div class="file-input-container">
+                <input 
+                  type="file" 
+                  id="imageFile"
+                  (change)="onFileSelected($event)"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  class="file-input">
+                <label for="imageFile" class="file-input-label">
+                  <span *ngIf="!isUploading && !uploadedImageUrl">📁 Choose Image</span>
+                  <span *ngIf="isUploading">⏳ Uploading...</span>
+                  <span *ngIf="!isUploading && uploadedImageUrl">✅ Image Uploaded</span>
+                </label>
+              </div>
+              
+              <!-- Image Preview -->
+              <div *ngIf="uploadedImageUrl" class="image-preview">
+                <img [src]="uploadedImageUrl" [alt]="'Product image'" class="preview-image">
+                <button type="button" class="remove-image-btn" (click)="removeImage()">
+                  🗑️ Remove
+                </button>
+              </div>
+              
+              <!-- Upload Progress -->
+              <div *ngIf="isUploading" class="upload-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <p>Uploading image...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" (click)="cancelForm()">
+              Cancel
+            </button>
+            <button type="submit" class="submit-btn">
+              {{ editingProduct ? 'Update Product' : 'Add Product' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading products...</p>
+    </div>
+
+    <!-- Products Table -->
+    <div *ngIf="!isLoading && products.length > 0" class="products-section">
+      <h2>Product Management</h2>
+      <div class="products-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of products">
+              <td class="product-image">
+                <img 
+                  [src]="product.imageUrl || 'assets/cart.svg'" 
+                  [alt]="product.name"
+                  class="product-thumbnail">
+              </td>
+              <td class="product-name">{{ product.name }}</td>
+              <td class="product-description">{{ product.description }}</td>
+              <td class="product-price">${{ product.price | number:'1.2-2' }}</td>
+              <td class="product-stock">
+                <span [class]="product.stockQuantity === 0 ? 'out-of-stock' : product.stockQuantity < 10 ? 'low-stock' : 'in-stock'">
+                  {{ product.stockQuantity }}
+                </span>
+              </td>
+              <td class="product-actions">
+                <button class="edit-btn" (click)="showEditProductForm(product)">
+                  ✏️ Edit
+                </button>
+                <button class="delete-btn" (click)="deleteProduct(product.id)">
+                  🗑️ Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- No Products -->
+    <div *ngIf="!isLoading && products.length === 0" class="no-products">
+      <p>No products available.</p>
+      <p>Click "Add New Product" to get started!</p>
+    </div>
+  </main>
+</div>

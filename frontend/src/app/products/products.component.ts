@@ -24,6 +24,9 @@ export class ProductsComponent implements OnInit {
   cartItemCount = 0;
   quantities: { [productId: string]: number } = {};
   
+  // Filter properties
+  sortBy = 'name'; 
+  
   // Expose Math functions to template
   Math = Math;
 
@@ -120,22 +123,47 @@ export class ProductsComponent implements OnInit {
     let filtered = this.products;
     console.log('Filtering products. Total products:', this.products.length);
 
-    // Filter by search term
-    if (this.searchTerm) {
+    // Filter by search term (name only)
+    if (this.searchTerm.trim()) {
+      const searchLower = this.searchTerm.toLowerCase().trim();
       filtered = filtered.filter(product => 
-        product.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(this.searchTerm.toLowerCase())
+        product.name.toLowerCase().includes(searchLower)
       );
       console.log('After search filter:', filtered.length);
     }
+
+    // Sort products
+    filtered = this.sortProducts(filtered);
 
     console.log('Final filtered products:', filtered);
     return filtered;
   }
 
+  sortProducts(products: Product[]): Product[] {
+    return [...products].sort((a, b) => {
+      switch (this.sortBy) {
+        case 'price-low':
+          return Number(a.price) - Number(b.price);
+        case 'price-high':
+          return Number(b.price) - Number(a.price);
+        case 'name':
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+  }
+
   get categories(): string[] {
-    // Since backend doesn't have categories, we'll use a simple filter
     return ['all'];
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.sortBy = 'name';
+  }
+
+  viewProduct(product: Product): void {
+    this.router.navigate(['/products', product.id]);
   }
 
   logout(): void {
@@ -149,15 +177,5 @@ export class ProductsComponent implements OnInit {
       return 'https://placehold.co/300x200/CCCCCC/666666?text=No+Image';
     }
     return product.imageUrl;
-  }
-
-  getStockStatus(product: Product): string {
-    if (product.stockQuantity === 0) return 'Out of Stock';
-    if (product.stockQuantity < 10) return `${product.stockQuantity} left`;
-    return `${product.stockQuantity} in stock`;
-  }
-
-  isLowStock(product: Product): boolean {
-    return product.stockQuantity < 10;
   }
 } 

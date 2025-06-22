@@ -1,0 +1,136 @@
+<div class="product-detail-page">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <h1>Shopie</h1>
+      </div>
+      <div class="user-actions">
+        <div class="welcome-message" *ngIf="currentUser">
+          Welcome, {{ currentUser.name }}!
+        </div>
+        <button class="nav-btn" routerLink="/products">
+          🛍️ Products
+        </button>
+        <button class="nav-btn" routerLink="/profile">
+          👤 Profile
+        </button>
+        <button class="cart-btn" routerLink="/cart">
+          🛒 Cart
+          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </button>
+        <button class="logout-btn" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Back Button -->
+    <div class="back-section">
+      <button class="back-btn" (click)="goBack()">
+        ← Back to Products
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading product...</p>
+    </div>
+
+    <!-- Product Detail -->
+    <div *ngIf="!isLoading && product" class="product-detail">
+      <div class="product-layout">
+        <!-- Product Image -->
+        <div class="product-image-section">
+          <div class="product-image">
+            <img [src]="getProductImage(product)" [alt]="product.name">
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-info-section">
+          <div class="product-header">
+            <h1 class="product-name">{{ product.name }}</h1>
+            <div class="product-stock" [class.low-stock]="isLowStock(product)">
+              {{ getStockStatus(product) }}
+            </div>
+          </div>
+
+          <div class="product-description">
+            <h3>Description</h3>
+            <p>{{ product.description }}</p>
+          </div>
+
+          <div class="product-price">
+            <h3>Price</h3>
+            <span class="price">${{ product.price | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="product-actions">
+            <div class="quantity-section">
+              <h3>Quantity</h3>
+              <div class="quantity-selector">
+                <button 
+                  class="qty-btn" 
+                  (click)="updateQuantity(-1)" 
+                  [disabled]="addingToCart || quantity <= 1">
+                  -
+                </button>
+                <input 
+                  type="number" 
+                  min="1" 
+                  [max]="product.stockQuantity" 
+                  [(ngModel)]="quantity" 
+                  [disabled]="addingToCart" 
+                  class="qty-input">
+                <button 
+                  class="qty-btn" 
+                  (click)="updateQuantity(1)" 
+                  [disabled]="addingToCart || quantity >= product.stockQuantity">
+                  +
+                </button>
+                <span class="qty-stock">/ {{ product.stockQuantity }}</span>
+              </div>
+            </div>
+
+            <button 
+              class="add-to-cart-btn" 
+              (click)="addToCart()"
+              [disabled]="product.stockQuantity === 0 || addingToCart">
+              <span *ngIf="addingToCart">Adding...</span>
+              <span *ngIf="!addingToCart">
+                {{ product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
+              </span>
+            </button>
+          </div>
+
+          <div class="product-meta">
+            <div class="meta-item">
+              <strong>Product ID:</strong> {{ product.id }}
+            </div>
+            <div class="meta-item">
+              <strong>Added:</strong> {{ product.createdAt | date:'mediumDate' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Not Found -->
+    <div *ngIf="!isLoading && !product && !errorMessage" class="no-product">
+      <p>Product not found.</p>
+      <button (click)="goBack()" class="back-btn">
+        Back to Products
+      </button>
+    </div>
+  </main>
+</div> 

@@ -4,18 +4,20 @@
     <div class="header-content">
       <div class="logo">
         <h1>Shopie</h1>
-      </div>
-      <div class="search-bar">
-        <input 
-          type="text" 
-          placeholder="Search products..." 
-          [(ngModel)]="searchTerm"
-          class="search-input">
-      </div>
-      <div class="user-actions">
-        <div class="welcome-message" *ngIf="currentUser">
-          Welcome, {{ currentUser.name }}!
+        <div class="welcome-section" *ngIf="currentUser">
+          <div class="welcome-message">
+            Welcome, {{ currentUser.name }}!
+          </div>
         </div>
+      </div>
+      
+      <div class="user-actions">
+        <button class="nav-btn" routerLink="/dashboard" *ngIf="currentUser?.role === 'ADMIN'">
+          ⚙️ Admin
+        </button>
+        <button class="nav-btn" routerLink="/profile">
+          👤 Profile
+        </button>
         <button class="cart-btn" routerLink="/cart">
           🛒 Cart
           <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
@@ -40,24 +42,56 @@
       <p>Loading products...</p>
     </div>
 
+    <!-- Filters Section -->
+    <div *ngIf="!isLoading && products.length > 0" class="filters-section">
+      <div class="filters-header">
+        <h3>Filters & Sort</h3>
+        <button class="clear-filters-btn" (click)="clearFilters()">
+          Clear All Filters
+        </button>
+      </div>
+      
+      <div class="filters-grid">
+        <!-- Search by Name -->
+        <div class="filter-group">
+          <label>Search by Name</label>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            placeholder="Enter product name..."
+            class="search-input">
+        </div>
+
+        <!-- Sort By -->
+        <div class="filter-group">
+          <label>Sort By</label>
+          <select [(ngModel)]="sortBy" class="filter-select">
+            <option value="name">Name A-Z</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+          </select>
+        </div>
+
+        <!-- Results Count -->
+        <div class="results-count">
+          <span>{{ filteredProducts.length }} of {{ products.length }} products</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Products Grid -->
     <div *ngIf="!isLoading && filteredProducts.length > 0" class="products-grid">
-      <div *ngFor="let product of filteredProducts" class="product-card">
+      <div *ngFor="let product of filteredProducts" class="product-card" (click)="viewProduct(product)">
         <div class="product-image">
           <img [src]="getProductImage(product)" [alt]="product.name">
         </div>
         <div class="product-info">
           <h3 class="product-name">{{ product.name }}</h3>
           <p class="product-description">{{ product.description }}</p>
-          <div class="product-meta">
-            <span class="product-stock" [class.low-stock]="isLowStock(product)">
-              {{ getStockStatus(product) }}
-            </span>
-          </div>
           <div class="product-price">
             <span class="price">${{ product.price | number:'1.2-2' }}</span>
           </div>
-          <div class="quantity-selector">
+          <div class="quantity-selector" (click)="$event.stopPropagation()">
             <button class="qty-btn" (click)="quantities[product.id] = Math.max(1, (quantities[product.id] || 1) - 1)" [disabled]="addingToCart[product.id] || (quantities[product.id] || 1) <= 1">-</button>
             <input type="number" min="1" [max]="product.stockQuantity" [(ngModel)]="quantities[product.id]" [value]="quantities[product.id] || 1" [disabled]="addingToCart[product.id]" class="qty-input">
             <button class="qty-btn" (click)="quantities[product.id] = Math.min(product.stockQuantity, (quantities[product.id] || 1) + 1)" [disabled]="addingToCart[product.id] || (quantities[product.id] || 1) >= product.stockQuantity">+</button>
@@ -65,7 +99,7 @@
           </div>
           <button 
             class="add-to-cart-btn" 
-            (click)="addToCart(product)"
+            (click)="addToCart(product); $event.stopPropagation()"
             [disabled]="product.stockQuantity === 0 || addingToCart[product.id]">
             <span *ngIf="addingToCart[product.id]">Adding...</span>
             <span *ngIf="!addingToCart[product.id]">
@@ -79,8 +113,8 @@
     <!-- No Products Found -->
     <div *ngIf="!isLoading && filteredProducts.length === 0 && products.length > 0" class="no-products">
       <p>No products found matching your search criteria.</p>
-      <button (click)="searchTerm = ''" class="clear-filters-btn">
-        Clear Search
+      <button (click)="clearFilters()" class="clear-filters-btn">
+        Clear Filters
       </button>
     </div>
 

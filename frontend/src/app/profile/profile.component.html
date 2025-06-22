@@ -1,1 +1,168 @@
-<p>profile works!</p>
+<div class="profile-page">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <h1>Shopie</h1>
+      </div>
+      <div class="user-actions">
+        <div class="welcome-message" *ngIf="currentUser">
+          Welcome, {{ currentUser.name }}!
+        </div>
+        <button class="nav-btn" routerLink="/products">
+          🛍️ Products
+        </button>
+        <button class="cart-btn" routerLink="/cart">
+          🛒 Cart
+          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </button>
+        <button class="logout-btn" (click)="logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="profile-container">
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <h2>My Profile</h2>
+        <p>Manage your account information and settings</p>
+      </div>
+
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <!-- View Mode -->
+        <div *ngIf="!isEditing" class="profile-view">
+          <div class="profile-info">
+            <div class="info-group">
+              <label>Name</label>
+              <p class="info-value">{{ currentUser?.name }}</p>
+            </div>
+            
+            <div class="info-group">
+              <label>Email</label>
+              <p class="info-value">{{ currentUser?.email }}</p>
+            </div>
+            
+            <div class="info-group">
+              <label>Role</label>
+              <p class="info-value">{{ getRoleDisplayName(currentUser?.role) }}</p>
+            </div>
+            
+            <div class="info-group">
+              <label>Member Since</label>
+              <p class="info-value">{{ getFormattedDate(currentUser?.createdAt) }}</p>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <button class="edit-btn" (click)="startEditing()">
+              ✏️ Edit Profile
+            </button>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div *ngIf="isEditing" class="profile-edit">
+          <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input 
+                type="text" 
+                id="name"
+                name="name"
+                [(ngModel)]="editForm.name"
+                required
+                class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input 
+                type="email" 
+                id="email"
+                name="email"
+                [(ngModel)]="editForm.email"
+                required
+                class="form-input">
+            </div>
+
+            <div class="password-section">
+              <h3>Change Password (Optional)</h3>
+              <p class="password-note">Leave blank if you don't want to change your password</p>
+              
+              <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <input 
+                  type="password" 
+                  id="currentPassword"
+                  name="currentPassword"
+                  [(ngModel)]="editForm.currentPassword"
+                  class="form-input">
+              </div>
+
+              <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input 
+                  type="password" 
+                  id="newPassword"
+                  name="newPassword"
+                  [(ngModel)]="editForm.newPassword"
+                  minlength="6"
+                  class="form-input">
+                <small class="form-help">Minimum 6 characters</small>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input 
+                  type="password" 
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  [(ngModel)]="editForm.confirmPassword"
+                  class="form-input">
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button 
+                type="button" 
+                class="cancel-btn" 
+                (click)="cancelEditing()"
+                [disabled]="isSaving">
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                class="save-btn" 
+                [disabled]="isSaving || !profileForm.form.valid">
+                <span *ngIf="isSaving">Saving...</span>
+                <span *ngIf="!isSaving">Save Changes</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      
+      <div class="danger-zone">
+        <div class="danger-card">
+          <div class="danger-info">
+            <h4>Delete Account</h4>
+            <p>Once you delete your account, there is no going back. Please be certain.</p>
+          </div>
+          <button 
+            class="delete-btn" 
+            (click)="deleteAccount()"
+            [disabled]="isLoading">
+            <span *ngIf="isLoading">Deleting...</span>
+            <span *ngIf="!isLoading">Delete Account</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

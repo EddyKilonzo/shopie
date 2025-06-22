@@ -6,6 +6,8 @@ interface User {
     id: string;
     email: string;
     name: string;
+    role: string;
+    createdAt: string;
 }
 
 interface LoginRequest {
@@ -19,10 +21,19 @@ interface SignupRequest {
     name: string;
 }
 
+interface UpdateProfileRequest {
+    name: string;
+    email: string;
+    currentPassword?: string;
+    newPassword?: string;
+}
+
 interface AuthResponse {
     token?: string;
     user?: User;
     message: string;
+    success?: boolean;
+    data?: User;
 }
 
 @Injectable({
@@ -81,6 +92,29 @@ export class AuthService {
             );
     }
 
+    updateProfile(updateData: UpdateProfileRequest): Observable<AuthResponse> {
+        return this.http.put<AuthResponse>(`http://localhost:3000/users/profile`, updateData)
+            .pipe(
+                tap(response => {
+                    if (response.success && response.data) {
+                        localStorage.setItem('user', JSON.stringify(response.data));
+                        this.currentUserSubject.next(response.data);
+                    }
+                })
+            );
+    }
+
+    deleteAccount(): Observable<AuthResponse> {
+        return this.http.delete<AuthResponse>(`http://localhost:3000/users/profile`)
+            .pipe(
+                tap(response => {
+                    if (response.success) {
+                        this.logout();
+                    }
+                })
+            );
+    }
+
     logout(): void {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -97,5 +131,10 @@ export class AuthService {
 
     getCurrentUser(): User | null {
         return this.currentUserSubject.value;
+    }
+
+    setCurrentUser(user: User): void {
+        this.currentUserSubject.next(user);
+        localStorage.setItem('user', JSON.stringify(user));
     }
 }

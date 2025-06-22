@@ -29,6 +29,9 @@ export class CartComponent implements OnInit {
     this.loadCart();
   }
 
+  /**
+   * Loads the cart
+   */
   loadCart(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -56,6 +59,10 @@ export class CartComponent implements OnInit {
     this.totalItems = this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
   }
 
+  /**
+   * Removes an item from the cart
+   * @param itemId - The ID of the item to remove
+   */
   removeFromCart(itemId: string): void {
     this.cartService.removeFromCart(itemId).subscribe({
       next: (response) => {
@@ -73,6 +80,9 @@ export class CartComponent implements OnInit {
     });
   }
 
+  /**
+   * Logs out the user
+   */
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

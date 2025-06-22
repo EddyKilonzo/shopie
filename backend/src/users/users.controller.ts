@@ -17,6 +17,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -126,12 +127,13 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   async updateProfile(
     @Request() req: { user: { userId: string } },
-    @Body(new ValidationPipe({ transform: true })) updateUserDto: UpdateUserDto,
+    @Body(new ValidationPipe({ transform: true }))
+    updateProfileDto: UpdateProfileDto,
   ): Promise<ApiResponse<User>> {
     try {
-      const user = await this.usersService.update(
+      const user = await this.usersService.updateProfile(
         req.user.userId,
-        updateUserDto,
+        updateProfileDto,
       );
       return {
         success: true,

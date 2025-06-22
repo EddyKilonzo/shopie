@@ -2,10 +2,12 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'generated/prisma';
 import { JwtService } from '@nestjs/jwt';
@@ -293,6 +295,72 @@ export class UsersService {
     } catch (error) {
       console.error(`Error deleting user with id ${id}:`, error);
       throw error;
+    }
+  }
+
+  async updateProfile(id: string, data: UpdateProfileDto): Promise<User> {
+    try {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { id },
+      });
+      if (!existingUser) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+
+      // Check if email is being changed and if it's already taken
+      if (typeof data.email === 'string' && data.email !== existingUser.email) {
+        const userWithEmail = await this.prisma.user.findUnique({
+          where: { email: data.email },
+        });
+        if (userWithEmail) {
+          throw new ConflictException(
+            `User with email ${data.email} already exists`,
+          );
+        }
+      }
+
+      const updateData: Partial<Pick<User, 'name' | 'email' | 'password'>> = {};
+      if (typeof data.name === 'string') updateData.name = data.name;
+      if (typeof data.email === 'string') updateData.email = data.email;
+
+      // Handle password change
+      if (data.newPassword) {
+        if (!data.currentPassword) {
+          throw new BadRequestException(
+            'Current password is required to change password',
+          );
+        }
+
+        // Verify current password
+        const isCurrentPasswordValid = await bcrypt.compare(
+          data.currentPassword,
+          existingUser.password,
+        );
+        if (!isCurrentPasswordValid) {
+          throw new BadRequestException('Current password is incorrect');
+        }
+
+        // Hash new password
+        const hashedNewPassword = await this.hashPassword(data.newPassword);
+        updateData.password = hashedNewPassword;
+      }
+
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: updateData,
+      });
+
+      if (!updatedUser) {
+        throw new Error('Failed to update user');
+      }
+
+      return this.mapPrismaUserToInterface(updatedUser);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(`Error updating user with id ${id}:`, error.message);
+        throw error;
+      }
+      throw new Error('Unknown error updating user');
     }
   }
 }

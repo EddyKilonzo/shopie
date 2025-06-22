@@ -12,7 +12,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
-  signup(signupData: { email: string; password: string; name: string; }) {
+  signup() {
     throw new Error('Method not implemented.');
   }
   constructor(

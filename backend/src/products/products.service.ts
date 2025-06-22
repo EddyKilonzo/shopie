@@ -107,6 +107,12 @@ export class ProductsService {
    */
   async delete(id: string): Promise<Product> {
     try {
+      // First, delete all cart items that reference this product
+      await this.prisma.cart.deleteMany({
+        where: { productId: id },
+      });
+
+      // Then delete the product
       const product = await this.prisma.product.delete({
         where: { id },
       });

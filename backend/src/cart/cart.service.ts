@@ -204,4 +204,22 @@ export class CartService {
       );
     }
   }
+
+  /**
+   * Clears all items from the user's cart.
+   * @param userId - The ID of the user.
+   */
+  async clearCart(userId: string): Promise<void> {
+    try {
+      // Delete all cart items for the user
+      await this.prisma.cart.deleteMany({
+        where: { userId },
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error clearing cart');
+    }
+  }
 }

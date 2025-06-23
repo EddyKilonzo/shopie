@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { ProductsService, Product, ImageUploadResponse } from '../../services/products';
 import { ToastService } from '../../services/toast';
+import { NavbarComponent } from '../shared/navbar.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

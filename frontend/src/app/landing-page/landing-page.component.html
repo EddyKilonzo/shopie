@@ -1,0 +1,55 @@
+<app-navbar [isLandingPage]="true"></app-navbar>
+
+<div class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="left">
+            <h2>Welcome to <span class="brand">Shopie</span></h2>
+            <p class="subtitle">Your one-stop shop for quality products and exceptional service</p>
+            <a routerLink="/products" class="btn cta-btn">Shop Now</a>
+        </div>
+        <div class="right">
+            <img src="assets/shoe01.png" alt="Shopie Product">
+        </div>
+    </div>
+</div>
+
+<section id="about" class="about-us">
+    <h2>Why Choose Shopie?</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-truck-fast"></i></div>
+        <h3>Fast Delivery</h3>
+        <p>Get your orders delivered to your doorstep within 24-48 hours. We ensure quick and reliable shipping across the country.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+        <h3>Easy Shopping</h3>
+        <p>Browse through our extensive collection with ease. Simple navigation, secure checkout, and multiple payment options.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-headset"></i></div>
+        <h3>Great Customer Service</h3>
+        <p>Our dedicated support team is available 24/7 to assist you with any queries or concerns. We're here to help!</p>
+      </div>
+    </div>
+</section>
+
+<section class="featured-products">
+    <h2>Featured Products</h2>
+    <div class="product-grid">
+        <div class="product-card" *ngFor="let product of products">
+            <img
+                [src]="product.imageUrl || 'https://placehold.co/300x300'"
+                alt="{{ product.name }}"
+                class="product-image"
+            />
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="price">{{ product.price | currency }}</p>
+                <a [routerLink]="['/products', product.id]" class="btn">View Details</a>
+            </div>
+        </div>
+    </div>
+</section>
+

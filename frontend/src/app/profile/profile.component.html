@@ -1,27 +1,6 @@
 <div class="profile-page">
   <!-- Header -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <h1>Shopie</h1>
-      </div>
-      <div class="user-actions">
-        <div class="welcome-message" *ngIf="currentUser">
-          Welcome, {{ currentUser.name }}!
-        </div>
-        <button class="nav-btn" routerLink="/products">
-          🛍️ Products
-        </button>
-        <button class="cart-btn" routerLink="/cart">
-          🛒 Cart
-          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
-        </button>
-        <button class="logout-btn" (click)="logout()">
-          Logout
-        </button>
-      </div>
-    </div>
-  </header>
+  <app-navbar></app-navbar>
 
   <!-- Main Content -->
   <main class="main-content">
@@ -60,7 +39,7 @@
 
           <div class="profile-actions">
             <button class="edit-btn" (click)="startEditing()">
-              ✏️ Edit Profile
+              <i class="fas fa-edit"></i> Edit Profile
             </button>
           </div>
         </div>

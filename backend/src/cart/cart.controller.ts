@@ -140,4 +140,30 @@ export class CartController {
       throw new BadRequestException('Error removing from cart');
     }
   }
+
+  @Delete()
+  @ApiOperation({ summary: 'Clear all items from cart' })
+  @ApiResponse({
+    status: 200,
+    description: 'Cart cleared successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @HttpCode(HttpStatus.OK)
+  async clearCart(
+    @Request() req: { user: { userId: string } },
+  ): Promise<ApiResponse<void>> {
+    try {
+      await this.cartService.clearCart(req.user.userId);
+      return {
+        success: true,
+        message: 'Cart cleared successfully',
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error clearing cart');
+    }
+  }
 }

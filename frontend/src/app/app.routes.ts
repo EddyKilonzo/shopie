@@ -7,6 +7,7 @@ import { ProductDetailComponent } from './products/product-detail/product-detail
 import { CartComponent } from './cart/cart.component';
 import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from './auth.guard';
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -16,5 +17,6 @@ export const routes: Routes = [
     { path: 'products/:id', component: ProductDetailComponent, canActivate: [AuthGuard] },
     { path: 'cart', component: CartComponent, canActivate: [AuthGuard] },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-    { path: '', redirectTo: '/products', pathMatch: 'full' }
+    { path: 'products', redirectTo: '/products', pathMatch: 'full' },
+    { path: '', component: LandingPageComponent },
 ];

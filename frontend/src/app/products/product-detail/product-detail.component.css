@@ -109,6 +109,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  padding-top: 90px; /* Account for fixed navbar */
 }
 
 /* Back Button */

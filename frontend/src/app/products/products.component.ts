@@ -6,12 +6,14 @@ import { AuthService } from '../../services/auth';
 import { ProductsService, Product } from '../../services/products';
 import { CartService } from '../../services/cart';
 import { ToastService } from '../../services/toast';
+import { NavbarComponent } from '../shared/navbar.component';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, FormsModule, RouterModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './products.component.html',
-  styleUrl: './products.component.css'
+  styleUrls: ['./products.component.css']
 })
 export class ProductsComponent implements OnInit {
   products: Product[] = [];

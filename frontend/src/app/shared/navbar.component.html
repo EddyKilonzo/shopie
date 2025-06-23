@@ -1,0 +1,32 @@
+<header>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo" routerLink="/">
+        <i class="fa-solid fa-shopping-bag"></i>
+        <h1>Shopie</h1>
+      </div>
+      
+      <ul class="nav-links" *ngIf="!isLandingPage && currentUser">
+        <li><a routerLink="/products" routerLinkActive="active">Products</a></li>
+        <li><a routerLink="/profile" routerLinkActive="active">Profile</a></li>
+        <li><a routerLink="/cart" routerLinkActive="active" class="cart-link">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </a></li>
+        <li><a routerLink="/dashboard" routerLinkActive="active" *ngIf="isAdmin">Admin</a></li>
+        <li><button class="logout-btn" (click)="logout()">Logout</button></li>
+      </ul>
+      
+      <ul class="nav-links" *ngIf="isLandingPage">
+        <li><a routerLink="/products" routerLinkActive="active">Products</a></li>
+        <li><a href="#about" routerLinkActive="active">About Us</a></li>
+        <li><a routerLink="/contact" routerLinkActive="active">Contact</a></li>
+        <li><a routerLink="/login" class="login-btn">Login</a></li>
+      </ul>
+      
+      <div class="mobile-menu-btn">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+    </div>
+  </nav>
+</header> 

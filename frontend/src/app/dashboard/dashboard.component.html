@@ -1,26 +1,6 @@
 <div class="admin-dashboard">
   <!-- Header -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <h1>Shopie Admin</h1>
-        <div class="welcome-section" *ngIf="currentUser">
-          <div class="welcome-message">
-            Welcome, {{ currentUser.name }}! (Admin)
-          </div>
-        </div>
-      </div>
-      
-      <div class="user-actions">
-        <button class="nav-btn" (click)="navigateToProducts()">
-          🛍️ View Store
-        </button>
-        <button class="logout-btn" (click)="logout()">
-          Logout
-        </button>
-      </div>
-    </div>
-  </header>
+  <app-navbar></app-navbar>
 
   <!-- Main Content -->
   <main class="main-content">
@@ -43,10 +23,10 @@
     <!-- Action Buttons -->
     <div class="action-buttons">
       <button class="add-product-btn" (click)="showAddProductForm()">
-        ➕ Add New Product
+        <i class="fas fa-plus"></i> Add New Product
       </button>
       <button class="refresh-btn" (click)="loadProducts()">
-        🔄 Refresh Products
+        <i class="fas fa-sync-alt"></i> Refresh Products
       </button>
     </div>
 
@@ -55,7 +35,9 @@
       <div class="product-form">
         <div class="form-header">
           <h2>{{ editingProduct ? 'Edit Product' : 'Add New Product' }}</h2>
-          <button class="close-btn" (click)="cancelForm()">✕</button>
+          <button class="close-btn" (click)="cancelForm()">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         
         <form (ngSubmit)="editingProduct ? updateProduct() : addProduct()">
@@ -120,9 +102,15 @@
                   accept="image/jpeg,image/jpg,image/png,image/webp"
                   class="file-input">
                 <label for="imageFile" class="file-input-label">
-                  <span *ngIf="!isUploading && !uploadedImageUrl">📁 Choose Image</span>
-                  <span *ngIf="isUploading">⏳ Uploading...</span>
-                  <span *ngIf="!isUploading && uploadedImageUrl">✅ Image Uploaded</span>
+                  <span *ngIf="!isUploading && !uploadedImageUrl">
+                    <i class="fas fa-folder-open"></i> Choose Image
+                  </span>
+                  <span *ngIf="isUploading">
+                    <i class="fas fa-spinner fa-spin"></i> Uploading...
+                  </span>
+                  <span *ngIf="!isUploading && uploadedImageUrl">
+                    <i class="fas fa-check"></i> Image Uploaded
+                  </span>
                 </label>
               </div>
               
@@ -130,7 +118,7 @@
               <div *ngIf="uploadedImageUrl" class="image-preview">
                 <img [src]="uploadedImageUrl" [alt]="'Product image'" class="preview-image">
                 <button type="button" class="remove-image-btn" (click)="removeImage()">
-                  🗑️ Remove
+                  <i class="fas fa-trash"></i> Remove
                 </button>
               </div>
               
@@ -200,10 +188,10 @@
               </td>
               <td class="product-actions">
                 <button class="edit-btn" (click)="showEditProductForm(product)">
-                  ✏️ Edit
+                  <i class="fas fa-edit"></i> Edit
                 </button>
                 <button class="delete-btn" (click)="deleteProduct(product.id)">
-                  🗑️ Delete
+                  <i class="fas fa-trash"></i> Delete
                 </button>
               </td>
             </tr>

@@ -1,33 +1,6 @@
 <div class="products-page">
   <!-- Header -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <h1>Shopie</h1>
-        <div class="welcome-section" *ngIf="currentUser">
-          <div class="welcome-message">
-            Welcome, {{ currentUser.name }}!
-          </div>
-        </div>
-      </div>
-      
-      <div class="user-actions">
-        <button class="nav-btn" routerLink="/dashboard" *ngIf="currentUser?.role === 'ADMIN'">
-          ⚙️ Admin
-        </button>
-        <button class="nav-btn" routerLink="/profile">
-          👤 Profile
-        </button>
-        <button class="cart-btn" routerLink="/cart">
-          🛒 Cart
-          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
-        </button>
-        <button class="logout-btn" (click)="logout()">
-          Logout
-        </button>
-      </div>
-    </div>
-  </header>
+  <app-navbar></app-navbar>
 
   <!-- Main Content -->
   <main class="main-content">
@@ -66,7 +39,7 @@
         <div class="filter-group">
           <label>Sort By</label>
           <select [(ngModel)]="sortBy" class="filter-select">
-            <option value="name">Name A-Z</option>
+            <option value="name">Price</option>
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
           </select>

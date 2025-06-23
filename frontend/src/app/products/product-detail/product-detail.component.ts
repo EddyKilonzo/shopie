@@ -6,10 +6,12 @@ import { AuthService } from '../../../services/auth';
 import { ProductsService, Product } from '../../../services/products';
 import { CartService } from '../../../services/cart';
 import { ToastService } from '../../../services/toast';
+import { NavbarComponent } from '../../shared/navbar.component';
 
 @Component({
   selector: 'app-product-detail',
-  imports: [CommonModule, FormsModule, RouterModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css'
 })

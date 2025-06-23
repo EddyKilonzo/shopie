@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 export interface CartItem {
   id: string;
@@ -30,8 +31,12 @@ export interface ApiResponse<T> {
 })
 export class CartService {
   private apiUrl = 'http://localhost:3000/cart';
+  private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
+  public cartItems$ = this.cartItemsSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.loadCartItems();
+  }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -41,10 +46,24 @@ export class CartService {
     });
   }
 
+  private loadCartItems(): void {
+    this.getCartItems().subscribe(response => {
+      if (response.success && response.data) {
+        this.cartItemsSubject.next(response.data);
+      }
+    });
+  }
+
   addToCart(request: AddToCartRequest): Observable<ApiResponse<CartItem>> {
     return this.http.post<ApiResponse<CartItem>>(`${this.apiUrl}/add`, request, {
       headers: this.getHeaders()
-    });
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          this.loadCartItems(); // Refresh cart items
+        }
+      })
+    );
   }
 
   getCartItems(): Observable<ApiResponse<CartItem[]>> {
@@ -56,18 +75,40 @@ export class CartService {
   updateCartItem(itemId: string, quantity: number): Observable<ApiResponse<CartItem>> {
     return this.http.put<ApiResponse<CartItem>>(`${this.apiUrl}/${itemId}`, { quantity }, {
       headers: this.getHeaders()
-    });
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          this.loadCartItems(); // Refresh cart items
+        }
+      })
+    );
   }
 
   removeFromCart(itemId: string): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${itemId}`, {
       headers: this.getHeaders()
-    });
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          this.loadCartItems(); // Refresh cart items
+        }
+      })
+    );
   }
 
   clearCart(): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}`, {
       headers: this.getHeaders()
-    });
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          this.cartItemsSubject.next([]); // Clear cart items
+        }
+      })
+    );
+  }
+
+  refreshCart(): void {
+    this.loadCartItems();
   }
 } 

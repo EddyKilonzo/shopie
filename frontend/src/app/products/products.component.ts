@@ -29,6 +29,10 @@ export class ProductsComponent implements OnInit {
   // Filter properties
   sortBy = 'name'; 
   
+  // Pagination properties
+  currentPage = 1;
+  itemsPerPage = 1; //12 items a page
+  
   // Expose Math functions to template
   Math = Math;
 
@@ -141,6 +145,62 @@ export class ProductsComponent implements OnInit {
     return filtered;
   }
 
+  // Get paginated products for current page
+  get paginatedProducts(): Product[] {
+    const filtered = this.filteredProducts;
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return filtered.slice(startIndex, endIndex);
+  }
+
+  // Get total number of pages
+  get totalPages(): number {
+    return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+  }
+
+  // Get array of page numbers for pagination controls
+  get pageNumbers(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const pages: number[] = [];
+    
+    // Show up to 5 page numbers around current page
+    const start = Math.max(1, current - 2);
+    const end = Math.min(total, current + 2);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  // Navigate to specific page
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  // Go to previous page
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  // Go to next page
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  // Reset pagination when filters change
+  resetPagination(): void {
+    this.currentPage = 1;
+  }
+
   sortProducts(products: Product[]): Product[] {
     return [...products].sort((a, b) => {
       switch (this.sortBy) {
@@ -162,6 +222,7 @@ export class ProductsComponent implements OnInit {
   clearFilters(): void {
     this.searchTerm = '';
     this.sortBy = 'name';
+    this.resetPagination();
   }
 
   viewProduct(product: Product): void {

@@ -53,8 +53,8 @@
     </div>
 
     <!-- Products Grid -->
-    <div *ngIf="!isLoading && filteredProducts.length > 0" class="products-grid">
-      <div *ngFor="let product of filteredProducts" class="product-card" (click)="viewProduct(product)">
+    <div *ngIf="!isLoading && paginatedProducts.length > 0" class="products-grid">
+      <div *ngFor="let product of paginatedProducts" class="product-card" (click)="viewProduct(product)">
         <div class="product-image">
           <img [src]="getProductImage(product)" [alt]="product.name">
         </div>
@@ -80,6 +80,65 @@
             </span>
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="!isLoading && totalPages > 1" class="pagination-container">
+      <div class="pagination-info">
+        <span>Showing {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredProducts.length) }} of {{ filteredProducts.length }} products</span>
+      </div>
+      
+      <div class="pagination-controls">
+        <!-- Previous Button -->
+        <button 
+          class="pagination-btn" 
+          (click)="previousPage()" 
+          [disabled]="currentPage === 1">
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        
+        <!-- Page Numbers -->
+        <div class="page-numbers">
+          <!-- First page if not in range -->
+          <button 
+            *ngIf="pageNumbers[0] > 1" 
+            class="page-btn" 
+            (click)="goToPage(1)">
+            1
+          </button>
+          
+          <!-- Ellipsis if gap exists -->
+          <span *ngIf="pageNumbers[0] > 2" class="page-ellipsis">...</span>
+          
+          <!-- Page number buttons -->
+          <button 
+            *ngFor="let page of pageNumbers" 
+            class="page-btn" 
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+          
+          <!-- Ellipsis if gap exists -->
+          <span *ngIf="pageNumbers[pageNumbers.length - 1] < totalPages - 1" class="page-ellipsis">...</span>
+          
+          <!-- Last page if not in range -->
+          <button 
+            *ngIf="pageNumbers[pageNumbers.length - 1] < totalPages" 
+            class="page-btn" 
+            (click)="goToPage(totalPages)">
+            {{ totalPages }}
+          </button>
+        </div>
+        
+        <!-- Next Button -->
+        <button 
+          class="pagination-btn" 
+          (click)="nextPage()" 
+          [disabled]="currentPage === totalPages">
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
 

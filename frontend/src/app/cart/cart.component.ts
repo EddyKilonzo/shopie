@@ -20,7 +20,7 @@ interface CheckoutData {
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })

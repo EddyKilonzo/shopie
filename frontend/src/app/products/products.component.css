@@ -497,6 +497,122 @@
   .filters-header {
     flex-direction: column;
     gap: 1rem;
-    align-items: stretch;
+    text-align: center;
+  }
+}
+
+/* Pagination Styles */
+.pagination-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination-info {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #4a7c59;
+  color: white;
+  border-color: #4a7c59;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  background: #f8f9fa;
+  color: #999;
+  cursor: not-allowed;
+  border-color: #e9ecef;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.page-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 40px;
+  text-align: center;
+}
+
+.page-btn:hover:not(.active) {
+  background: #f8f9fa;
+  border-color: #4a7c59;
+  color: #4a7c59;
+}
+
+.page-btn.active {
+  background: #4a7c59;
+  color: white;
+  border-color: #4a7c59;
+  font-weight: 600;
+}
+
+.page-ellipsis {
+  padding: 0.5rem 0.25rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Responsive pagination */
+@media (max-width: 768px) {
+  .pagination-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .page-numbers {
+    order: 2;
+  }
+  
+  .pagination-btn {
+    order: 1;
+  }
+  
+  .pagination-info {
+    order: 3;
+    text-align: center;
   }
 } 

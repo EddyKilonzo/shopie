@@ -119,11 +119,9 @@ export class CartComponent implements OnInit {
     
     // Simulate payment processing
     setTimeout(() => {
-      // In a real application, you would send this data to your backend
       console.log('Checkout data:', this.checkoutData);
       console.log('Order total:', this.cartTotal);
       
-      // Simulate successful order
       this.toastService.success('Order placed successfully!');
       
       // Clear cart after successful order

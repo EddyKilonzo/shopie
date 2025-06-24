@@ -21,7 +21,7 @@
         <div class="item-info">
           <h3>{{ item.productName }}</h3>
           <p>Quantity: {{ item.quantity }}</p>
-          <p class="item-total">Total: ${{ item.total | number:'1.2-2' }}</p>
+          <p class="item-total">Total: KSH {{ item.total | number:'1.2-2' }}</p>
         </div>
         <div class="item-actions">
           <button class="remove-btn" (click)="removeFromCart(item.id)">
@@ -31,7 +31,7 @@
       </div>
       
       <div class="cart-summary">
-        <h3>Cart Total: ${{ cartTotal | number:'1.2-2' }}</h3>
+        <h3>Cart Total: KSH {{ cartTotal | number:'1.2-2' }}</h3>
         <p>Total Items: {{ totalItems }}</p>
         <button class="checkout-btn" (click)="showCheckoutForm()">
           Proceed to Checkout
@@ -55,11 +55,11 @@
           <div class="summary-items">
             <div *ngFor="let item of cartItems" class="summary-item">
               <span>{{ item.productName }} x {{ item.quantity }}</span>
-              <span>${{ item.total | number:'1.2-2' }}</span>
+              <span>KSH {{ item.total | number:'1.2-2' }}</span>
             </div>
           </div>
           <div class="summary-total">
-            <strong>Total: ${{ cartTotal | number:'1.2-2' }}</strong>
+            <strong>Total: KSH {{ cartTotal | number:'1.2-2' }}</strong>
           </div>
         </div>
 

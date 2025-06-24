@@ -6,6 +6,7 @@ export interface Toast {
   message: string;
   type: 'success' | 'error' | 'info';
   duration?: number;
+  userId?: string | null;
 }
 
 @Injectable({
@@ -15,19 +16,25 @@ export class ToastService {
   private toasts = new BehaviorSubject<Toast[]>([]);
   public toasts$ = this.toasts.asObservable();
   private nextId = 1;
+  private currentUserId: string | null = null;
+
+  setCurrentUser(userId: string | null) {
+    this.currentUserId = userId;
+    this.toasts.next([]);
+  }
 
   show(message: string, type: 'success' | 'error' | 'info' = 'info', duration: number = 3000) {
     const toast: Toast = {
       id: this.nextId++,
       message,
       type,
-      duration
+      duration,
+      userId: this.currentUserId
     };
 
     const currentToasts = this.toasts.value;
     this.toasts.next([...currentToasts, toast]);
 
-    // Auto remove after duration
     setTimeout(() => {
       this.remove(toast.id);
     }, duration);
@@ -48,5 +55,12 @@ export class ToastService {
 
   info(message: string, duration?: number) {
     this.show(message, 'info', duration);
+  }
+
+  getCurrentUserToasts(): Toast[] {
+    if (this.currentUserId === null) {
+      return [];
+    }
+    return this.toasts.value.filter(toast => toast.userId === this.currentUserId);
   }
 } 

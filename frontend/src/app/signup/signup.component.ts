@@ -46,13 +46,26 @@ export class SignupComponent implements OnInit{
       this.isLoading = true;
       this.errorMessage = '';
       this.successMessage = '';
+      
+      console.log('Starting signup process...', this.signupData);
+
+      // Add a timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        if (this.isLoading) {
+          console.log('Signup request timed out');
+          this.isLoading = false;
+          this.showMessage('Request timed out. Please try again.', 'error');
+        }
+      }, 10000); // 10 second timeout
 
       this.authService.signup(this.signupData).subscribe({
         next: (response) => {
+          clearTimeout(timeoutId);
+          console.log('Signup response received:', response);
           this.isLoading = false;
           // Check if signup was actually successful
           if (response.message === 'User registered successfully' && response.token && response.user) {
-            this.showMessage('Account created successfully! Redirecting...', 'success');
+            this.showMessage('Creating account...', 'success');
             setTimeout(() => {
               this.router.navigate(['/products']);
             }, 1000);
@@ -62,6 +75,8 @@ export class SignupComponent implements OnInit{
           }
         },
         error: (error: any) => {
+          clearTimeout(timeoutId);
+          console.error('Signup error:', error);
           this.isLoading = false;
           this.showMessage(error.error?.message || 'Signup failed. Please try again.', 'error');
         }

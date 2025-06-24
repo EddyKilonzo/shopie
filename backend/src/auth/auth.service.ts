@@ -86,14 +86,9 @@ export class AuthService {
   async register(user: CreateUserDto): Promise<AuthResponse> {
     try {
       // Check if user already exists
-      try {
-        const existingUser = await this.usersService.findByEmail(user.email);
-        if (existingUser) {
-          return { message: 'User already exists' };
-        }
-      } catch (error) {
-        console.error('Error checking existing user:', error);
-        return { message: 'Error checking existing user' };
+      const existingUser = await this.usersService.findByEmail(user.email);
+      if (existingUser) {
+        return { message: 'User already exists' };
       }
 
       const result = await this.usersService.create(user);

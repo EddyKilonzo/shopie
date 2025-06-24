@@ -46,7 +46,7 @@
             />
             <div class="product-info">
                 <h3>{{ product.name }}</h3>
-                <p class="price">{{ product.price | currency }}</p>
+                <p class="price">KSH {{ product.price | number:'1.2-2' }}</p>
                 <a [routerLink]="['/products', product.id]" class="btn">View Details</a>
             </div>
         </div>

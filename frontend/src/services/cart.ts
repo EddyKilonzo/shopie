@@ -35,7 +35,11 @@ export class CartService {
   public cartItems$ = this.cartItemsSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    this.loadCartItems();
+    // Only load cart items if there's a valid token
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.loadCartItems();
+    }
   }
 
   private getHeaders(): HttpHeaders {
@@ -47,9 +51,26 @@ export class CartService {
   }
 
   private loadCartItems(): void {
-    this.getCartItems().subscribe(response => {
-      if (response.success && response.data) {
-        this.cartItemsSubject.next(response.data);
+    // Only proceed if there's a valid token
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.cartItemsSubject.next([]);
+      return;
+    }
+
+    this.getCartItems().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.cartItemsSubject.next(response.data);
+        } else {
+          // If there's an error, set empty array to avoid stale data
+          this.cartItemsSubject.next([]);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading cart items:', error);
+        // Set empty array on error to avoid stale data
+        this.cartItemsSubject.next([]);
       }
     });
   }
@@ -102,7 +123,7 @@ export class CartService {
     }).pipe(
       tap(response => {
         if (response.success) {
-          this.cartItemsSubject.next([]); // Clear cart items
+          this.loadCartItems(); // Refresh cart items to ensure consistency
         }
       })
     );
@@ -110,5 +131,10 @@ export class CartService {
 
   refreshCart(): void {
     this.loadCartItems();
+  }
+
+  // Clear cart items when user switches (logout/login)
+  clearCartItems(): void {
+    this.cartItemsSubject.next([]);
   }
 } 

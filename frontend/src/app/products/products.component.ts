@@ -31,7 +31,7 @@ export class ProductsComponent implements OnInit {
   
   // Pagination properties
   currentPage = 1;
-  itemsPerPage = 1; //12 items a page
+  itemsPerPage = 12; // Show 12 products per page (3x4 grid)
   
   // Expose Math functions to template
   Math = Math;

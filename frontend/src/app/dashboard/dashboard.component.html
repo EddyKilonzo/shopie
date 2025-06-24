@@ -180,7 +180,7 @@
               </td>
               <td class="product-name">{{ product.name }}</td>
               <td class="product-description">{{ product.description }}</td>
-              <td class="product-price">${{ product.price | number:'1.2-2' }}</td>
+              <td class="product-price">KSH {{ product.price | number:'1.2-2' }}</td>
               <td class="product-stock">
                 <span [class]="product.stockQuantity === 0 ? 'out-of-stock' : product.stockQuantity < 10 ? 'low-stock' : 'in-stock'">
                   {{ product.stockQuantity }}

@@ -199,16 +199,16 @@ export class UsersService {
   /**
    * Fetches a user by email.
    * @param email - The email of the user to find.
-   * @returns  The user with the specified email.
+   * @returns  The user with the specified email or null if not found.
    */
 
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User | null> {
     try {
       const user = await this.prisma.user.findUnique({
         where: { email },
       });
       if (!user) {
-        throw new Error(`User with email ${email} not found`);
+        return null;
       }
       return this.mapPrismaUserToInterface(user);
     } catch (error: unknown) {

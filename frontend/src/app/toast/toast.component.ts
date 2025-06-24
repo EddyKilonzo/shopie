@@ -16,8 +16,9 @@ export class ToastComponent implements OnInit, OnDestroy {
   constructor(private toastService: ToastService) {}
 
   ngOnInit() {
-    this.subscription = this.toastService.toasts$.subscribe(toasts => {
-      this.toasts = toasts;
+    this.subscription = this.toastService.toasts$.subscribe(allToasts => {
+      // Only show toasts for current user
+      this.toasts = this.toastService.getCurrentUserToasts();
     });
   }
 

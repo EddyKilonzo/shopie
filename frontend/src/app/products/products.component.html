@@ -62,7 +62,7 @@
           <h3 class="product-name">{{ product.name }}</h3>
           <p class="product-description">{{ product.description }}</p>
           <div class="product-price">
-            <span class="price">${{ product.price | number:'1.2-2' }}</span>
+            <span class="price">KSH {{ product.price | number:'1.2-2' }}</span>
           </div>
           <div class="quantity-selector" (click)="$event.stopPropagation()">
             <button class="qty-btn" (click)="quantities[product.id] = Math.max(1, (quantities[product.id] || 1) - 1)" [disabled]="addingToCart[product.id] || (quantities[product.id] || 1) <= 1">-</button>

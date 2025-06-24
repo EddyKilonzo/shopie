@@ -22,6 +22,7 @@ export class ProductsComponent implements OnInit {
   searchTerm = '';
   selectedCategory = 'all';
   currentUser: any = null;
+  isAdmin = false;
   addingToCart: { [productId: string]: boolean } = {};
   cartItemCount = 0;
   quantities: { [productId: string]: number } = {};
@@ -52,6 +53,7 @@ export class ProductsComponent implements OnInit {
 
   loadCurrentUser(): void {
     this.currentUser = this.authService.getCurrentUser();
+    this.isAdmin = this.currentUser?.role === 'ADMIN';
   }
 
   loadCartCount(): void {

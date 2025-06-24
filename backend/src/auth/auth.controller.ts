@@ -17,7 +17,12 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordWithTokenDto } from './dto/reset-password-with-token.dto';
 import { AuthResponse } from './interfaces/auth-response.interface';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -46,7 +51,10 @@ export class AuthController {
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset email' })
-  @ApiResponse({ status: 200, description: 'Password reset email sent if user exists.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset email sent if user exists.',
+  })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async forgotPassword(
     @Body(ValidationPipe) forgotPasswordDto: ForgotPasswordDto,
@@ -69,12 +77,17 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password using reset token' })
   @ApiResponse({ status: 200, description: 'Password reset successfully.' })
-  @ApiResponse({ status: 400, description: 'Bad request - invalid or expired token.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - invalid or expired token.',
+  })
   async resetPasswordWithToken(
     @Body(ValidationPipe) resetPasswordWithTokenDto: ResetPasswordWithTokenDto,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const result = await this.authService.resetPasswordWithToken(resetPasswordWithTokenDto);
+      const result = await this.authService.resetPasswordWithToken(
+        resetPasswordWithTokenDto,
+      );
       return {
         success: true,
         message: result.message,

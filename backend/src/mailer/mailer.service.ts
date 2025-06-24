@@ -17,12 +17,15 @@ export class MailerService {
     private readonly mailerService: NestMailerService,
     private readonly configService: ConfigService,
   ) {}
+  /**
+   * Send a welcome email to the user
+   * @param to - The email address of the user
+   * @param name - The name of the user
+   */
 
   async sendWelcomeEmail(to: string, name: string): Promise<void> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (typeof this.mailerService.sendMail === 'function') {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         await this.mailerService.sendMail({
           to,
           subject: 'Welcome to Shopie',
@@ -32,7 +35,7 @@ export class MailerService {
             appName: 'Shopie',
             link:
               this.configService.get<string>('APP_LOGIN_URL') ||
-              'http://localhost:3000/login',
+              'http://localhost:4200/login',
           },
         });
       }
@@ -45,16 +48,19 @@ export class MailerService {
     }
   }
 
-  // Use the OrderDetails interface instead of 'any'
+  /**
+   * Send an order confirmation email to the user
+   * @param to - The email address of the user
+   * @param orderDetails - The details of the order
+   * @param userName - The name of the user
+   */
   async sendOrderConfirmationEmail(
     to: string,
     orderDetails: OrderDetails,
     userName: string,
   ): Promise<void> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (typeof this.mailerService.sendMail === 'function') {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         await this.mailerService.sendMail({
           to,
           subject: 'Order Confirmation',
@@ -67,7 +73,7 @@ export class MailerService {
             appName: 'Shopie',
             link:
               this.configService.get<string>('APP_URL') ||
-              'http://localhost:3000',
+              'http://localhost:4200',
             supportEmail: this.configService.get<string>('SUPPORT_EMAIL') || '',
           },
         });
@@ -81,6 +87,11 @@ export class MailerService {
     }
   }
 
+  /**
+   * Send a password reset email to the user
+   * @param to - The email address of the user
+   * @param resetToken - The token to reset the password
+   */
   async sendPasswordResetEmail(to: string, resetToken: string): Promise<void> {
     try {
       this.logger.log(`Attempting to send password reset email to ${to}`);
@@ -92,17 +103,14 @@ export class MailerService {
         return;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (typeof this.mailerService.sendMail === 'function') {
         const appResetUrl = this.configService.get<string>('APP_RESET_URL');
         this.logger.log(`APP_RESET_URL from config: ${appResetUrl}`);
 
-        // Always include the token in the URL
         const baseUrl = appResetUrl || 'http://localhost:4200/reset-password';
         const resetUrl = `${baseUrl}?token=${resetToken}`;
         this.logger.log(`Final reset URL: ${resetUrl}`);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         await this.mailerService.sendMail({
           to,
           subject: 'Password Reset Request',
@@ -124,7 +132,7 @@ export class MailerService {
         (error as Error)?.message || error,
       );
       this.logger.error('Full error details:', error);
-      throw error; // Re-throw to see the error in the auth service
+      throw error;
     }
   }
 }

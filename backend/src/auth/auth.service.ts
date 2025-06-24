@@ -165,15 +165,22 @@ export class AuthService {
    * @param forgotPasswordDto - The data transfer object containing the user's email.
    * @returns A message indicating the result of the operation.
    */
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{ success: boolean; message: string }> {
+  async forgotPassword(
+    forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<{ success: boolean; message: string }> {
     try {
-      console.log(`Processing forgot password request for email: ${forgotPasswordDto.email}`);
-      
+      console.log(
+        `Processing forgot password request for email: ${forgotPasswordDto.email}`,
+      );
+
       const user = await this.usersService.findByEmail(forgotPasswordDto.email);
       if (!user) {
         console.log(`User not found for email: ${forgotPasswordDto.email}`);
         // Don't reveal if user exists or not for security
-        return { success: true, message: 'If the email exists, a password reset link has been sent' };
+        return {
+          success: true,
+          message: 'If the email exists, a password reset link has been sent',
+        };
       }
 
       console.log(`User found: ${user.email}, ID: ${user.id}`);
@@ -198,18 +205,27 @@ export class AuthService {
         console.log('Attempting to send password reset email...');
         await this.mailerService.sendPasswordResetEmail(user.email, resetToken);
         console.log(`Password reset email sent successfully to ${user.email}`);
-        return { success: true, message: 'Password reset email sent successfully' };
+        return {
+          success: true,
+          message: 'Password reset email sent successfully',
+        };
       } catch (error) {
         console.error('Failed to send password reset email:', error);
         console.error('Error details:', {
           message: (error as Error)?.message,
           stack: (error as Error)?.stack,
         });
-        return { success: false, message: 'Failed to send password reset email' };
+        return {
+          success: false,
+          message: 'Failed to send password reset email',
+        };
       }
     } catch (error) {
       console.error('Error in forgot password:', error);
-      return { success: false, message: 'Error processing forgot password request' };
+      return {
+        success: false,
+        message: 'Error processing forgot password request',
+      };
     }
   }
 
@@ -218,7 +234,9 @@ export class AuthService {
    * @param resetPasswordWithTokenDto - The data transfer object containing the reset token and new password.
    * @returns A message indicating the result of the operation.
    */
-  async resetPasswordWithToken(resetPasswordWithTokenDto: ResetPasswordWithTokenDto): Promise<{ message: string }> {
+  async resetPasswordWithToken(
+    resetPasswordWithTokenDto: ResetPasswordWithTokenDto,
+  ): Promise<{ message: string }> {
     try {
       // Find user with valid reset token
       const user = await this.prisma.user.findFirst({
@@ -235,7 +253,10 @@ export class AuthService {
       }
 
       // Hash the new password
-      const hashedNewPassword = await bcrypt.hash(resetPasswordWithTokenDto.newPassword, 10);
+      const hashedNewPassword = await bcrypt.hash(
+        resetPasswordWithTokenDto.newPassword,
+        10,
+      );
 
       // Update password and clear reset token
       await this.prisma.user.update({

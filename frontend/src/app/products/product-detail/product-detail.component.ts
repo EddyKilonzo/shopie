@@ -20,6 +20,7 @@ export class ProductDetailComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   currentUser: any = null;
+  isAdmin = false;
   addingToCart = false;
   cartItemCount = 0;
   quantity = 1;
@@ -44,6 +45,7 @@ export class ProductDetailComponent implements OnInit {
 
   loadCurrentUser(): void {
     this.currentUser = this.authService.getCurrentUser();
+    this.isAdmin = this.currentUser?.role === 'ADMIN';
   }
 
   /**

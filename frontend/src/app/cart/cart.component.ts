@@ -86,7 +86,11 @@ export class CartComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading cart:', error);
-        this.errorMessage = 'Failed to load cart. Please try again.';
+        if (error.status === 403) {
+          this.errorMessage = 'Admin users cannot access cart functionality. Please use a customer account to make purchases.';
+        } else {
+          this.errorMessage = 'Failed to load cart. Please try again.';
+        }
         this.isLoading = false;
       }
     });
@@ -112,55 +116,61 @@ export class CartComponent implements OnInit {
   }
 
   /**
-   * Processes the checkout
+   * Processes the checkout and sends order confirmation email
    */
   processCheckout(): void {
+    if (this.cartItems.length === 0) {
+      this.toastService.error('Your cart is empty');
+      return;
+    }
+
     this.isProcessing = true;
     
-    // Simulate payment processing
-    setTimeout(() => {
-      console.log('Checkout data:', this.checkoutData);
-      console.log('Order total:', this.cartTotal);
-      
-      this.toastService.success('Order placed successfully!');
-      
-      // Clear cart after successful order
-      this.cartService.clearCart().subscribe({
-        next: (response) => {
-          if (response.success) {
-            // Clear local cart data
-            this.cartItems = [];
-            this.cartTotal = 0;
-            this.totalItems = 0;
-            this.showCheckout = false;
-            
-            // Reset checkout form
-            this.checkoutData = {
-              firstName: '',
-              lastName: '',
-              email: '',
-              phone: '',
-              address: '',
-              city: '',
-              zipCode: ''
-            };
-            
-            // Reinitialize with user data if available
-            this.initializeCheckoutData();
-            
-            this.router.navigate(['/products']); // Redirect to products
-          } else {
-            this.toastService.error('Order placed but there was an issue clearing the cart.');
-          }
-          this.isProcessing = false;
-        },
-        error: (error) => {
-          console.error('Error clearing cart:', error);
-          this.toastService.error('Order placed but there was an issue clearing the cart.');
-          this.isProcessing = false;
+    // Call the actual checkout API that sends order confirmation email
+    this.cartService.checkout().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.toastService.success(response.data.message);
+          
+          // Clear local cart data
+          this.cartItems = [];
+          this.cartTotal = 0;
+          this.totalItems = 0;
+          this.showCheckout = false;
+          
+          // Reset checkout form
+          this.checkoutData = {
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            address: '',
+            city: '',
+            zipCode: ''
+          };
+          
+          // Reinitialize with user data if available
+          this.initializeCheckoutData();
+          
+          // Show success message with order details
+          const orderId = response.data.orderId;
+          this.toastService.success(`Order #${orderId} placed successfully! Check your email for confirmation.`);
+          
+          // Redirect to products page after a short delay
+          setTimeout(() => {
+            this.router.navigate(['/products']);
+          }, 3000);
+        } else {
+          this.toastService.error(response.message || 'Failed to process checkout');
         }
-      });
-    }, 2000); // Simulate 2-second processing time
+        this.isProcessing = false;
+      },
+      error: (error) => {
+        console.error('Error processing checkout:', error);
+        this.toastService.error('Failed to process checkout. Please try again.');
+        this.isProcessing = false;
+      }
+    });
   }
 
   /**

@@ -20,6 +20,18 @@ Authorization: Bearer {{authToken}}
 GET {{baseUrl}}/cart
 Authorization: Bearer {{authToken}}
 
+### Get cart total
+GET {{baseUrl}}/cart/total
+Authorization: Bearer {{authToken}}
+
 ### Remove item from cart
 DELETE {{baseUrl}}/cart/cart_item_id
+Authorization: Bearer {{authToken}}
+
+### Clear cart
+DELETE {{baseUrl}}/cart
+Authorization: Bearer {{authToken}}
+
+### Checkout and send order confirmation email
+POST {{baseUrl}}/cart/checkout
 Authorization: Bearer {{authToken}} 

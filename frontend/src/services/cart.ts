@@ -19,6 +19,11 @@ export interface AddToCartRequest {
   quantity: number;
 }
 
+export interface CheckoutResponse {
+  message: string;
+  orderId: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -41,6 +46,10 @@ export class CartService {
       this.loadCartItems();
     }
   }
+  /**
+   * This method is used to get the headers for the cart items
+   * @returns The headers for the cart items
+   */
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -49,6 +58,10 @@ export class CartService {
       'Authorization': `Bearer ${token}`
     });
   }
+  /**
+   * This method is used to load the cart items
+   * @returns The cart items
+   */
 
   private loadCartItems(): void {
     // Only proceed if there's a valid token
@@ -57,6 +70,10 @@ export class CartService {
       this.cartItemsSubject.next([]);
       return;
     }
+    /**
+     * This method is used to get the cart items
+     * @returns The cart items
+     */
 
     this.getCartItems().subscribe({
       next: (response) => {
@@ -71,9 +88,19 @@ export class CartService {
         console.error('Error loading cart items:', error);
         // Set empty array on error to avoid stale data
         this.cartItemsSubject.next([]);
+        
+        // If it's a 403 error (admin user), don't show error in console
+        if (error.status !== 403) {
+          console.error('Cart access error:', error);
+        }
       }
     });
   }
+  /**
+   * This method is used to add a product to the cart
+   * @param request - The request to add a product to the cart
+   * @returns The cart item
+   */
 
   addToCart(request: AddToCartRequest): Observable<ApiResponse<CartItem>> {
     return this.http.post<ApiResponse<CartItem>>(`${this.apiUrl}/add`, request, {
@@ -86,13 +113,22 @@ export class CartService {
       })
     );
   }
+  /**
+   * This method is used to get the cart items
+   * @returns The cart items
+   */
 
   getCartItems(): Observable<ApiResponse<CartItem[]>> {
     return this.http.get<ApiResponse<CartItem[]>>(`${this.apiUrl}`, {
       headers: this.getHeaders()
     });
   }
-
+  /**
+   * This method is used to update the quantity of a product in the cart
+   * @param itemId - The id of the item to update
+   * @param quantity - The quantity to update the item to
+   * @returns The cart item
+   */
   updateCartItem(itemId: string, quantity: number): Observable<ApiResponse<CartItem>> {
     return this.http.put<ApiResponse<CartItem>>(`${this.apiUrl}/${itemId}`, { quantity }, {
       headers: this.getHeaders()
@@ -104,7 +140,11 @@ export class CartService {
       })
     );
   }
-
+  /**
+   * This method is used to remove a product from the cart
+   * @param itemId - The id of the item to remove
+   * @returns The cart item
+   */
   removeFromCart(itemId: string): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${itemId}`, {
       headers: this.getHeaders()
@@ -116,6 +156,10 @@ export class CartService {
       })
     );
   }
+  /**
+   * This method is used to clear the cart
+   * @returns The cart item
+   */
 
   clearCart(): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}`, {
@@ -128,12 +172,33 @@ export class CartService {
       })
     );
   }
+  /**
+   * This method is used to checkout the cart
+   * @returns The checkout response
+   */
+  checkout(): Observable<ApiResponse<CheckoutResponse>> {
+    return this.http.post<ApiResponse<CheckoutResponse>>(`${this.apiUrl}/checkout`, {}, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          // Clear cart items after successful checkout
+          this.cartItemsSubject.next([]);
+        }
+      })
+    );
+  }
+  /**
+   * This method is used to refresh the cart
+   */
 
   refreshCart(): void {
     this.loadCartItems();
   }
 
-  // Clear cart items when user switches (logout/login)
+  /**
+   * This method is used to clear the cart items
+   */
   clearCartItems(): void {
     this.cartItemsSubject.next([]);
   }

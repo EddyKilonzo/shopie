@@ -123,7 +123,10 @@ export class UsersService {
 
     // Send welcome email
     try {
-      await this.mailerService.sendWelcomeEmail(mappedUser.email, mappedUser.name);
+      await this.mailerService.sendWelcomeEmail(
+        mappedUser.email,
+        mappedUser.name,
+      );
     } catch (error) {
       console.error('Failed to send welcome email:', error);
       // Don't throw error here as user creation was successful

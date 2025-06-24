@@ -6,10 +6,18 @@
         <h1>Shopie</h1>
       </div>
       
+      <!-- User Greeting Section -->
+      <div class="user-greeting" *ngIf="!isLandingPage && currentUser">
+        <div class="greeting-text">
+          <span class="welcome-text">Welcome,</span>
+          <span class="user-name">{{ currentUser.name }}</span>
+        </div>
+      </div>
+      
       <ul class="nav-links" *ngIf="!isLandingPage && currentUser">
         <li><a routerLink="/products" routerLinkActive="active">Products</a></li>
         <li><a routerLink="/profile" routerLinkActive="active">Profile</a></li>
-        <li><a routerLink="/cart" routerLinkActive="active" class="cart-link">
+        <li><a routerLink="/cart" routerLinkActive="active" class="cart-link" *ngIf="!isAdmin">
           <i class="fa-solid fa-cart-shopping"></i>
           <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
         </a></li>

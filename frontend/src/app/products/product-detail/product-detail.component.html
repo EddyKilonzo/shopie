@@ -52,7 +52,7 @@
           </div>
 
           <div class="product-actions">
-            <div class="quantity-section">
+            <div class="quantity-section" *ngIf="!isAdmin">
               <h3>Quantity</h3>
               <div class="quantity-selector">
                 <button 
@@ -81,7 +81,8 @@
             <button 
               class="add-to-cart-btn" 
               (click)="addToCart()"
-              [disabled]="product.stockQuantity === 0 || addingToCart">
+              [disabled]="product.stockQuantity === 0 || addingToCart || isAdmin"
+              *ngIf="!isAdmin">
               <span *ngIf="addingToCart">Adding...</span>
               <span *ngIf="!addingToCart">
                 {{ product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart' }}

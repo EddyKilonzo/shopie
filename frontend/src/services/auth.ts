@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable, tap, BehaviorSubject } from 'rxjs';
+import { Observable, tap, BehaviorSubject, firstValueFrom } from 'rxjs';
 import { ToastService } from './toast';
 import { CartService } from './cart';
 
@@ -30,12 +30,26 @@ interface UpdateProfileRequest {
     newPassword?: string;
 }
 
+interface ForgotPasswordRequest {
+    email: string;
+}
+
+interface ResetPasswordWithTokenRequest {
+    resetToken: string;
+    newPassword: string;
+}
+
 interface AuthResponse {
     token?: string;
     user?: User;
     message: string;
     success?: boolean;
     data?: User;
+}
+
+interface ForgotPasswordResponse {
+    success: boolean;
+    message: string;
 }
 
 @Injectable({
@@ -53,6 +67,9 @@ export class AuthService {
     ) {
         this.loadStoredUser();
     }
+    /**
+     * This method is used to load the stored user from the local storage
+     */
 
     private loadStoredUser(): void {
         const token = localStorage.getItem('token');
@@ -77,6 +94,11 @@ export class AuthService {
             this.cartService.clearCartItems();
         }
     }
+    /**
+     * This method is used to login the user
+     * @param loginRequest - The login request
+     * @returns The auth response
+     */
 
     login(loginRequest: LoginRequest): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login`, loginRequest)
@@ -93,6 +115,11 @@ export class AuthService {
                 })
             );
     }
+    /**
+     * This method is used to signup the user
+     * @param signupRequest - The signup request
+     * @returns The auth response
+     */
 
     signup(signupRequest: SignupRequest): Observable<AuthResponse> {
         console.log('AuthService: Making signup request to', `${this.apiUrl}/register`);
@@ -111,6 +138,29 @@ export class AuthService {
                 })
             );
     }
+    /**
+     * This method is used to send the forgot password email to the user
+     * @param email - The email of the user
+     * @returns The forgot password response
+     */
+
+    async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+        return firstValueFrom(this.http.post<ForgotPasswordResponse>(`${this.apiUrl}/forgot-password`, { email }));
+    }
+    /**
+     * This method is used to reset the password of the user
+     * @param resetData - The reset data
+     * @returns The auth response
+     */
+
+    async resetPasswordWithToken(resetData: ResetPasswordWithTokenRequest): Promise<AuthResponse> {
+        return firstValueFrom(this.http.post<AuthResponse>(`${this.apiUrl}/reset-password-with-token`, resetData));
+    }
+    /**
+     * This method is used to update the profile of the user
+     * @param updateData - The update data
+     * @returns The auth response
+     */
 
     updateProfile(updateData: UpdateProfileRequest): Observable<AuthResponse> {
         return this.http.put<AuthResponse>(`http://localhost:3000/users/profile`, updateData)
@@ -124,6 +174,10 @@ export class AuthService {
                 })
             );
     }
+    /**
+     * This method is used to delete the account of the user
+     * @returns The auth response
+     */
 
     deleteAccount(): Observable<AuthResponse> {
         return this.http.delete<AuthResponse>(`http://localhost:3000/users/profile`)
@@ -135,6 +189,9 @@ export class AuthService {
                 })
             );
     }
+    /**
+     * This method is used to logout the user
+     */
 
     logout(): void {
         localStorage.removeItem('token');
@@ -143,18 +200,35 @@ export class AuthService {
         this.toastService.setCurrentUser(null);
         this.cartService.clearCartItems();
     }
+    /**
+     * This method is used to get the token of the user
+     * @returns The token of the user
+     */
 
     getToken(): string | null {
         return localStorage.getItem('token');
     }
+    /**
+     * This method is used to check if the user is logged in
+     * @returns true if the user is logged in, false otherwise
+     */
 
     isLoggedIn(): boolean {
         return !!this.getToken();
     }
 
+    /**
+     * This method is used to get the current user
+     * @returns The current user
+     */
+
     getCurrentUser(): User | null {
         return this.currentUserSubject.value;
     }
+    /**
+     * This method is used to set the current user
+     * @param user - The user to set
+     */
 
     setCurrentUser(user: User): void {
         this.currentUserSubject.next(user);

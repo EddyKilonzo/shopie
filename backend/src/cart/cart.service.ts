@@ -232,7 +232,9 @@ export class CartService {
    * @param userId - The ID of the user.
    * @returns Order confirmation details.
    */
-  async checkout(userId: string): Promise<{ message: string; orderId: string }> {
+  async checkout(
+    userId: string,
+  ): Promise<{ message: string; orderId: string }> {
     try {
       // Get user details
       const user = await this.prisma.user.findUnique({
@@ -256,12 +258,15 @@ export class CartService {
       }
 
       // Calculate total
-      const total = cartItems.reduce((sum, item) => sum + Number(item.total), 0);
+      const total = cartItems.reduce(
+        (sum, item) => sum + Number(item.total),
+        0,
+      );
 
       // Create order details for email
       const orderDetails = {
         id: `ORDER-${Date.now()}`,
-        items: cartItems.map(item => ({
+        items: cartItems.map((item) => ({
           name: item.productName,
           price: Number(item.total),
           quantity: item.quantity,
@@ -285,7 +290,8 @@ export class CartService {
       await this.clearCart(userId);
 
       return {
-        message: 'Order placed successfully! Check your email for confirmation.',
+        message:
+          'Order placed successfully! Check your email for confirmation.',
         orderId: orderDetails.id,
       };
     } catch (error: unknown) {

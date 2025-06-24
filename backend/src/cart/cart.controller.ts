@@ -15,6 +15,7 @@ import {
 import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CustomerGuard } from '../auth/guards/customer.guard';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -32,7 +33,7 @@ interface ApiResponse<T> {
 
 @ApiTags('cart')
 @Controller('cart')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CustomerGuard)
 @ApiBearerAuth('JWT-auth')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
@@ -42,9 +43,13 @@ export class CartController {
   @ApiResponse({ status: 201, description: 'Item added to cart successfully.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
   @HttpCode(HttpStatus.CREATED)
   async addToCart(
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: string; email: string; role: string } },
     @Body(new ValidationPipe({ transform: true })) addToCartDto: AddToCartDto,
   ): Promise<ApiResponse<Cart>> {
     try {
@@ -69,9 +74,13 @@ export class CartController {
   @ApiOperation({ summary: 'Get user cart' })
   @ApiResponse({ status: 200, description: 'Cart retrieved successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
   @HttpCode(HttpStatus.OK)
   async getUserCart(
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: string; email: string; role: string } },
   ): Promise<ApiResponse<Cart[]>> {
     try {
       const cartItems = await this.cartService.getUserCart(req.user.userId);
@@ -95,9 +104,13 @@ export class CartController {
     description: 'Cart total calculated successfully.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
   @HttpCode(HttpStatus.OK)
   async getCartTotal(
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: string; email: string; role: string } },
   ): Promise<ApiResponse<{ total: number; itemCount: number }>> {
     try {
       const cartTotal = await this.cartService.getCartTotal(req.user.userId);
@@ -122,9 +135,13 @@ export class CartController {
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
   @HttpCode(HttpStatus.OK)
   async removeFromCart(
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: string; email: string; role: string } },
     @Param('id') cartItemId: string,
   ): Promise<ApiResponse<void>> {
     try {
@@ -149,9 +166,13 @@ export class CartController {
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
   @HttpCode(HttpStatus.OK)
   async clearCart(
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: string; email: string; role: string } },
   ): Promise<ApiResponse<void>> {
     try {
       await this.cartService.clearCart(req.user.userId);
@@ -175,9 +196,13 @@ export class CartController {
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
   @HttpCode(HttpStatus.OK)
   async checkout(
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: string; email: string; role: string } },
   ): Promise<ApiResponse<{ message: string; orderId: string }>> {
     try {
       const result = await this.cartService.checkout(req.user.userId);

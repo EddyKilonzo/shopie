@@ -165,6 +165,29 @@
   font-size: 13px;
 }
 
+.links {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.links p {
+  margin: 8px 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.links a {
+  color: #4a7c59;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.links a:hover {
+  color: #5a8c69;
+  text-decoration: underline;
+}
+
 .right p {
   text-align: center;
   margin-top: 15px;

@@ -64,7 +64,7 @@
           <div class="product-price">
             <span class="price">KSH {{ product.price | number:'1.2-2' }}</span>
           </div>
-          <div class="quantity-selector" (click)="$event.stopPropagation()">
+          <div class="quantity-selector" (click)="$event.stopPropagation()" *ngIf="!isAdmin">
             <button class="qty-btn" (click)="quantities[product.id] = Math.max(1, (quantities[product.id] || 1) - 1)" [disabled]="addingToCart[product.id] || (quantities[product.id] || 1) <= 1">-</button>
             <input type="number" min="1" [max]="product.stockQuantity" [(ngModel)]="quantities[product.id]" [value]="quantities[product.id] || 1" [disabled]="addingToCart[product.id]" class="qty-input">
             <button class="qty-btn" (click)="quantities[product.id] = Math.min(product.stockQuantity, (quantities[product.id] || 1) + 1)" [disabled]="addingToCart[product.id] || (quantities[product.id] || 1) >= product.stockQuantity">+</button>
@@ -73,7 +73,8 @@
           <button 
             class="add-to-cart-btn" 
             (click)="addToCart(product); $event.stopPropagation()"
-            [disabled]="product.stockQuantity === 0 || addingToCart[product.id]">
+            [disabled]="product.stockQuantity === 0 || addingToCart[product.id] || isAdmin"
+            *ngIf="!isAdmin">
             <span *ngIf="addingToCart[product.id]">Adding...</span>
             <span *ngIf="!addingToCart[product.id]">
               {{ product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart' }}

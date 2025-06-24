@@ -28,10 +28,18 @@ export class NavbarComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       this.isAdmin = user?.role === 'ADMIN';
-    });
-
-    this.cartService.cartItems$.subscribe(items => {
-      this.cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+      
+      /**
+       * This method is used to get the cart items for non-admin users
+       */
+      if (!this.isAdmin) {
+        this.cartService.cartItems$.subscribe(items => {
+          this.cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+        });
+      } else {
+        // Set cart count to 0 for admin users
+        this.cartItemCount = 0;
+      }
     });
   }
 

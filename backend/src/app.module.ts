@@ -9,7 +9,14 @@ import { CartModule } from './cart/cart.module';
 import { MailerModule } from './mailer/mailer.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, ProductsModule, CartModule, MailerModule],
+  imports: [
+    PrismaModule,
+    UsersModule,
+    AuthModule,
+    ProductsModule,
+    CartModule,
+    MailerModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

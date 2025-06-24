@@ -3,86 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order</title>
+    <title>Order Confirmation - Shopie</title>
 </head>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
             color: #333;
             padding: 20px;
+            margin: 0;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
             background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4a7c59;
+        }
+        .header h1 {
+            color: #4a7c59;
+            font-size: 28px;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .header p {
+            color: #666;
+            font-size: 16px;
+            margin: 0;
+        }
+        .order-info {
+            background-color: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
         }
-        .container h1 {
+        .order-id {
+            font-size: 18px;
+            color: #4a7c59;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .order-summary {
+            margin-bottom: 25px;
+        }
+        .order-summary h2 {
             color: #333;
-            text-align: center;
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
         }
-        .container p {
-            font-size: 16px;
-            line-height: 1.5;
-            text-align: center;
-        }
-        .container ul {
+        .items-list {
             list-style-type: none;
             padding: 0;
+            margin: 0;
         }
-        .container ul li {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #555;
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .item:last-child {
+            border-bottom: none;
+        }
+        .item-name {
+            font-weight: 500;
+            color: #333;
+        }
+        .item-details {
+            text-align: right;
+            color: #666;
+        }
+        .item-price {
+            font-weight: 600;
+            color: #4a7c59;
+        }
+        .total-section {
+            background-color: #4a7c59;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
             text-align: center;
-
+            margin: 25px 0;
         }
-        .container a {
+        .total-amount {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+        .shipping-info {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .shipping-info p {
+            margin: 0;
+            color: #2d5a27;
+            font-weight: 500;
+        }
+        .cta-button {
             display: inline-block;
-            padding: 10px 20px;
-            background-color: #28a745;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4a7c59 0%, #2d5a27 100%);
             color: #fff;
             text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: transform 0.2s ease;
         }
-        .container a:hover {
-            background-color: #218838;
-            transition: 0.5s all ease-in-out;
+        .cta-button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #5a8c69 0%, #4a7c59 100%);
         }
         .footer {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
             color: #777;
+            font-size: 14px;
         }
-
+        .footer p {
+            margin: 5px 0;
+        }
+        .support-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .support-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .support-email {
+            color: #4a7c59;
+            font-weight: 600;
+        }
     </style>
 <body>
     <div class="container">
-        <h1>Order</h1>
-        <p>Thank you for your order!</p>
-        <p>Order ID: <strong><%= orderId %></strong></p>
-        <p>Items:</p>
-        <ul>
-            <% items.forEach(function(item) { %>
-                <li><%= item.name %> - $<%= item.price %></li>
-            <% }); %>
-        </ul>
-        <p>Total: $<%= total %></p>
-    </div>
-    <div class="container" style="text-align: center; margin-top: 20px;">
-        <p><%= user.name %> item will be sent to you within 5 days</p>
-    </div>
-    <div class="container" style="text-align: center; margin-top: 20px;">
-        <a href="<%= link %>">Continue Shopping</a>
-    </div>
+        <div class="header">
+            <h1>🎉 Order Confirmed!</h1>
+            <p>Thank you for your purchase, <%= user.name %>!</p>
+        </div>
 
-    <div class="footer">
-        <p>&copy; 2025 Shoppie. All rights reserved.</p>
-        <p>You received this email because you made a purchase on Shoppie.</p>
+        <div class="order-info">
+            <div class="order-id">
+                Order ID: <strong><%= orderId %></strong>
+            </div>
+            <p style="margin: 0; color: #666;">Order Date: <%= new Date().toLocaleDateString() %></p>
+        </div>
+
+        <div class="order-summary">
+            <h2>📦 Order Summary</h2>
+            <ul class="items-list">
+                <% items.forEach(function(item) { %>
+                    <li class="item">
+                        <span class="item-name"><%= item.name %></span>
+                        <div class="item-details">
+                            <div>Qty: <%= item.quantity %></div>
+                            <div class="item-price">$<%= item.price.toFixed(2) %></div>
+                        </div>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+
+        <div class="total-section">
+            <p class="total-amount">Total: $<%= total.toFixed(2) %></p>
+        </div>
+
+        <div class="shipping-info">
+            <p>🚚 Your order will be shipped within 3-5 business days</p>
+            <p>📧 You'll receive tracking information once your order ships</p>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="<%= link %>" class="cta-button">Continue Shopping</a>
+        </div>
+
+        <div class="support-info">
+            <p>Need help with your order?</p>
+            <p>Contact us at: <span class="support-email"><%= supportEmail %></span></p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Shopie</strong> - Your trusted online shopping destination</p>
+            <p>&copy; 2025 Shopie. All rights reserved.</p>
+            <p>You received this email because you made a purchase on Shopie.</p>
+        </div>
     </div>
 </body>
 </html>

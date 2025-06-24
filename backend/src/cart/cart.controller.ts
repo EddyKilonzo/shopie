@@ -166,4 +166,31 @@ export class CartController {
       throw new BadRequestException('Error clearing cart');
     }
   }
+
+  @Post('checkout')
+  @ApiOperation({ summary: 'Process checkout and send order confirmation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Checkout processed successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @HttpCode(HttpStatus.OK)
+  async checkout(
+    @Request() req: { user: { userId: string } },
+  ): Promise<ApiResponse<{ message: string; orderId: string }>> {
+    try {
+      const result = await this.cartService.checkout(req.user.userId);
+      return {
+        success: true,
+        message: result.message,
+        data: { message: result.message, orderId: result.orderId },
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error processing checkout');
+    }
+  }
 }

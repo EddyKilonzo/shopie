@@ -2,10 +2,14 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { Cart } from 'generated/prisma';
+import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class CartService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailerService: MailerService,
+  ) {}
 
   /**
    * Adds a product to the user's cart.
@@ -220,6 +224,75 @@ export class CartService {
         throw new BadRequestException(error.message);
       }
       throw new BadRequestException('Error clearing cart');
+    }
+  }
+
+  /**
+   * Processes checkout and sends order confirmation email.
+   * @param userId - The ID of the user.
+   * @returns Order confirmation details.
+   */
+  async checkout(userId: string): Promise<{ message: string; orderId: string }> {
+    try {
+      // Get user details
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+
+      // Get cart items
+      const cartItems = await this.prisma.cart.findMany({
+        where: { userId },
+        include: {
+          Product: true,
+        },
+      });
+
+      if (cartItems.length === 0) {
+        throw new BadRequestException('Cart is empty');
+      }
+
+      // Calculate total
+      const total = cartItems.reduce((sum, item) => sum + Number(item.total), 0);
+
+      // Create order details for email
+      const orderDetails = {
+        id: `ORDER-${Date.now()}`,
+        items: cartItems.map(item => ({
+          name: item.productName,
+          price: Number(item.total),
+          quantity: item.quantity,
+        })),
+        totalAmount: total,
+      };
+
+      // Send order confirmation email
+      try {
+        await this.mailerService.sendOrderConfirmationEmail(
+          user.email,
+          orderDetails,
+          user.name,
+        );
+      } catch (error) {
+        console.error('Failed to send order confirmation email:', error);
+        // Don't throw error here as checkout was successful
+      }
+
+      // Clear the cart
+      await this.clearCart(userId);
+
+      return {
+        message: 'Order placed successfully! Check your email for confirmation.',
+        orderId: orderDetails.id,
+      };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error processing checkout');
     }
   }
 }

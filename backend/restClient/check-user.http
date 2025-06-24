@@ -1,0 +1,10 @@
+### Check if user exists by trying to register
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "email": "eddboy188@gmail.com",
+  "password": "testpassword123",
+  "firstName": "Test",
+  "lastName": "User"
+} 

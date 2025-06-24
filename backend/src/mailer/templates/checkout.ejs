@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order</title>
+</head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .container h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container p {
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        .container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .container ul li {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+            text-align: center;
+
+        }
+        .container a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .container a:hover {
+            background-color: #218838;
+            transition: 0.5s all ease-in-out;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+
+    </style>
+<body>
+    <div class="container">
+        <h1>Order</h1>
+        <p>Thank you for your order!</p>
+        <p>Order ID: <strong><%= orderId %></strong></p>
+        <p>Items:</p>
+        <ul>
+            <% items.forEach(function(item) { %>
+                <li><%= item.name %> - $<%= item.price %></li>
+            <% }); %>
+        </ul>
+        <p>Total: $<%= total %></p>
+    </div>
+    <div class="container" style="text-align: center; margin-top: 20px;">
+        <p><%= user.name %> item will be sent to you within 5 days</p>
+    </div>
+    <div class="container" style="text-align: center; margin-top: 20px;">
+        <a href="<%= link %>">Continue Shopping</a>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Shoppie. All rights reserved.</p>
+        <p>You received this email because you made a purchase on Shoppie.</p>
+    </div>
+</body>
+</html>

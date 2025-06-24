@@ -11,6 +11,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'generated/prisma';
 import { JwtService } from '@nestjs/jwt';
+import { MailerService } from '../mailer/mailer.service';
 
 interface User {
   id: string;
@@ -32,6 +33,7 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService,
   ) {}
 
   private mapPrismaUserToInterface(user: {
@@ -118,6 +120,14 @@ export class UsersService {
       role: mappedUser.role,
     };
     const token = this.jwtService.sign(payload);
+
+    // Send welcome email
+    try {
+      await this.mailerService.sendWelcomeEmail(mappedUser.email, mappedUser.name);
+    } catch (error) {
+      console.error('Failed to send welcome email:', error);
+      // Don't throw error here as user creation was successful
+    }
 
     return {
       user: mappedUser,

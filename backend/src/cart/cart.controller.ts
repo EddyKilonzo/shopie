@@ -218,4 +218,108 @@ export class CartController {
       throw new BadRequestException('Error processing checkout');
     }
   }
+
+  @Post(':id/increase')
+  @ApiOperation({ summary: 'Increase quantity of cart item' })
+  @ApiResponse({
+    status: 200,
+    description: 'Quantity increased successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async increaseQuantity(
+    @Request() req: { user: { userId: string; email: string; role: string } },
+    @Param('id') cartItemId: string,
+  ): Promise<ApiResponse<Cart>> {
+    try {
+      const cartItem = await this.cartService.increaseQuantity(
+        req.user.userId,
+        cartItemId,
+      );
+      return {
+        success: true,
+        message: 'Quantity increased successfully',
+        data: cartItem,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error increasing quantity');
+    }
+  }
+
+  @Post(':id/decrease')
+  @ApiOperation({ summary: 'Decrease quantity of cart item' })
+  @ApiResponse({
+    status: 200,
+    description: 'Quantity decreased successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async decreaseQuantity(
+    @Request() req: { user: { userId: string; email: string; role: string } },
+    @Param('id') cartItemId: string,
+  ): Promise<ApiResponse<Cart | null>> {
+    try {
+      const cartItem = await this.cartService.decreaseQuantity(
+        req.user.userId,
+        cartItemId,
+      );
+      return {
+        success: true,
+        message: cartItem
+          ? 'Quantity decreased successfully'
+          : 'Item removed from cart',
+        data: cartItem,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error decreasing quantity');
+    }
+  }
+
+  @Get('purchase-history')
+  @ApiOperation({ summary: 'Get user purchase history' })
+  @ApiResponse({
+    status: 200,
+    description: 'Purchase history retrieved successfully.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin users cannot access cart.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getPurchaseHistory(
+    @Request() req: { user: { userId: string; email: string; role: string } },
+  ): Promise<ApiResponse<any[]>> {
+    try {
+      const purchases = await this.cartService.getPurchaseHistory(
+        req.user.userId,
+      );
+      return {
+        success: true,
+        message: 'Purchase history retrieved successfully',
+        data: purchases,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error retrieving purchase history');
+    }
+  }
 }

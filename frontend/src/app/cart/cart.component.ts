@@ -31,7 +31,9 @@ export class CartComponent implements OnInit {
   cartTotal = 0;
   totalItems = 0;
   showCheckout = false;
+  showHistory = false;
   isProcessing = false;
+  purchaseHistory: any[] = [];
   
   checkoutData: CheckoutData = {
     firstName: '',
@@ -53,6 +55,22 @@ export class CartComponent implements OnInit {
   ngOnInit(): void {
     this.loadCart();
     this.initializeCheckoutData();
+    
+    // Subscribe to purchase history changes
+    this.cartService.purchaseHistory$.subscribe(history => {
+      this.purchaseHistory = history;
+    });
+    
+    // Load existing purchase history if available
+    const existingHistory = this.cartService.getCurrentPurchaseHistory();
+    if (existingHistory.length > 0) {
+      this.purchaseHistory = existingHistory;
+      this.showHistory = true; // Show history by default if data exists
+    } else {
+      // Load purchase history from API if not in service
+      this.loadPurchaseHistory();
+      this.showHistory = true; // Show history by default
+    }
   }
 
   /**
@@ -113,6 +131,12 @@ export class CartComponent implements OnInit {
    */
   backToCart(): void {
     this.showCheckout = false;
+    this.showHistory = false;
+    
+    // If cart is empty after checkout, redirect to products page
+    if (this.cartItems.length === 0) {
+      this.router.navigate(['/products']);
+    }
   }
 
   /**
@@ -156,10 +180,11 @@ export class CartComponent implements OnInit {
           const orderId = response.data.orderId;
           this.toastService.success(`Order #${orderId} placed successfully! Check your email for confirmation.`);
           
-          // Redirect to products page after a short delay
-          setTimeout(() => {
-            this.router.navigate(['/products']);
-          }, 3000);
+          // Show purchase history after successful checkout
+          this.showPurchaseHistory();
+          
+          // Refresh purchase history to include the new order
+          this.loadPurchaseHistory();
         } else {
           this.toastService.error(response.message || 'Failed to process checkout');
         }
@@ -198,7 +223,99 @@ export class CartComponent implements OnInit {
    * Logs out the user
    */
   logout(): void {
+    this.cartService.clearPurchaseHistory();
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  /**
+   * Increases the quantity of an item in the cart
+   * @param itemId - The ID of the cart item
+   */
+  increaseQuantity(itemId: string): void {
+    this.isProcessing = true;
+    this.cartService.increaseQuantity(itemId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.toastService.success('Quantity increased');
+          this.loadCart(); // Reload cart to update totals
+        } else {
+          this.toastService.error(response.message || 'Failed to increase quantity');
+        }
+        this.isProcessing = false;
+      },
+      error: (error) => {
+        console.error('Error increasing quantity:', error);
+        this.toastService.error('Failed to increase quantity. Please try again.');
+        this.isProcessing = false;
+      }
+    });
+  }
+
+  /**
+   * Decreases the quantity of an item in the cart
+   * @param itemId - The ID of the cart item
+   */
+  decreaseQuantity(itemId: string): void {
+    this.isProcessing = true;
+    this.cartService.decreaseQuantity(itemId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          if (response.data) {
+            this.toastService.success('Quantity decreased');
+          } else {
+            this.toastService.success('Item removed from cart');
+          }
+          this.loadCart(); // Reload cart to update totals
+        } else {
+          this.toastService.error(response.message || 'Failed to decrease quantity');
+        }
+        this.isProcessing = false;
+      },
+      error: (error) => {
+        console.error('Error decreasing quantity:', error);
+        this.toastService.error('Failed to decrease quantity. Please try again.');
+        this.isProcessing = false;
+      }
+    });
+  }
+
+  /**
+   * Shows the purchase history
+   */
+  showPurchaseHistory(): void {
+    this.showHistory = true;
+    this.loadPurchaseHistory();
+  }
+
+  /**
+   * Shows the cart view
+   */
+  showCart(): void {
+    this.showHistory = false;
+    this.showCheckout = false;
+  }
+
+  /**
+   * Loads the purchase history
+   */
+  loadPurchaseHistory(): void {
+    this.isLoading = true;
+    this.cartService.getPurchaseHistory().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.purchaseHistory = response.data;
+          this.cartService.setPurchaseHistory(response.data);
+        } else {
+          this.toastService.error(response.message || 'Failed to load purchase history');
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading purchase history:', error);
+        this.toastService.error('Failed to load purchase history. Please try again.');
+        this.isLoading = false;
+      }
+    });
   }
 } 

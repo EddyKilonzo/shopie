@@ -37,7 +37,9 @@ export interface ApiResponse<T> {
 export class CartService {
   private apiUrl = 'http://localhost:3000/cart';
   private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
+  private purchaseHistorySubject = new BehaviorSubject<any[]>([]);
   public cartItems$ = this.cartItemsSubject.asObservable();
+  public purchaseHistory$ = this.purchaseHistorySubject.asObservable();
 
   constructor(private http: HttpClient) {
     // Only load cart items if there's a valid token
@@ -201,5 +203,78 @@ export class CartService {
    */
   clearCartItems(): void {
     this.cartItemsSubject.next([]);
+  }
+
+  /**
+   * Increases the quantity of an item in the cart
+   * @param itemId - The ID of the cart item
+   * @returns The updated cart item
+   */
+  increaseQuantity(itemId: string): Observable<ApiResponse<CartItem>> {
+    return this.http.post<ApiResponse<CartItem>>(`${this.apiUrl}/${itemId}/increase`, {}, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          this.loadCartItems(); // Refresh cart items
+        }
+      })
+    );
+  }
+
+  /**
+   * Decreases the quantity of an item in the cart
+   * @param itemId - The ID of the cart item
+   * @returns The updated cart item or null if removed
+   */
+  decreaseQuantity(itemId: string): Observable<ApiResponse<CartItem | null>> {
+    return this.http.post<ApiResponse<CartItem | null>>(`${this.apiUrl}/${itemId}/decrease`, {}, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          this.loadCartItems(); // Refresh cart items
+        }
+      })
+    );
+  }
+
+  /**
+   * Gets the purchase history for the current user
+   * @returns The purchase history
+   */
+  getPurchaseHistory(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/purchase-history`, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(response => {
+        if (response.success && response.data) {
+          this.purchaseHistorySubject.next(response.data);
+        }
+      })
+    );
+  }
+
+  /**
+   * Gets the current purchase history from the service
+   * @returns The current purchase history
+   */
+  getCurrentPurchaseHistory(): any[] {
+    return this.purchaseHistorySubject.value;
+  }
+
+  /**
+   * Sets the purchase history in the service
+   * @param history - The purchase history to set
+   */
+  setPurchaseHistory(history: any[]): void {
+    this.purchaseHistorySubject.next(history);
+  }
+
+  /**
+   * Clears the purchase history from the service
+   */
+  clearPurchaseHistory(): void {
+    this.purchaseHistorySubject.next([]);
   }
 } 

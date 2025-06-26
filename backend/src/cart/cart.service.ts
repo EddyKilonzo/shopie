@@ -263,9 +263,30 @@ export class CartService {
         0,
       );
 
+      // Create purchase record
+      const purchase = await this.prisma.purchase.create({
+        data: {
+          userId,
+          totalAmount: total,
+          status: 'CONFIRMED',
+          items: {
+            create: cartItems.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              price: item.Product.price,
+              productName: item.productName,
+              total: item.total,
+            })),
+          },
+        },
+        include: {
+          items: true,
+        },
+      });
+
       // Create order details for email
       const orderDetails = {
-        id: `ORDER-${Date.now()}`,
+        id: purchase.id,
         items: cartItems.map((item) => ({
           name: item.productName,
           price: Number(item.total),
@@ -292,13 +313,174 @@ export class CartService {
       return {
         message:
           'Order placed successfully! Check your email for confirmation.',
-        orderId: orderDetails.id,
+        orderId: purchase.id,
       };
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new BadRequestException(error.message);
       }
       throw new BadRequestException('Error processing checkout');
+    }
+  }
+
+  /**
+   * Increases the quantity of an item in the cart.
+   * @param userId - The ID of the user.
+   * @param cartItemId - The ID of the cart item.
+   * @returns The updated cart item.
+   */
+  async increaseQuantity(userId: string, cartItemId: string): Promise<Cart> {
+    try {
+      const cartItem = await this.prisma.cart.findFirst({
+        where: {
+          id: cartItemId,
+          userId,
+        },
+        include: {
+          Product: true,
+        },
+      });
+
+      if (!cartItem) {
+        throw new BadRequestException(
+          `Cart item with id ${cartItemId} not found`,
+        );
+      }
+
+      // Check if there's enough stock
+      if (cartItem.Product.stockQuantity < 1) {
+        throw new BadRequestException(
+          'No more stock available for this product',
+        );
+      }
+
+      // Update cart item quantity and total
+      const newQuantity = cartItem.quantity + 1;
+      const newTotal = Number(cartItem.Product.price) * newQuantity;
+
+      const updatedCartItem = await this.prisma.cart.update({
+        where: { id: cartItemId },
+        data: {
+          quantity: newQuantity,
+          total: newTotal,
+        },
+        include: {
+          Product: true,
+        },
+      });
+
+      // Decrease product stock
+      await this.prisma.product.update({
+        where: { id: cartItem.productId },
+        data: {
+          stockQuantity: {
+            decrement: 1,
+          },
+        },
+      });
+
+      return updatedCartItem;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error increasing quantity');
+    }
+  }
+
+  /**
+   * Decreases the quantity of an item in the cart.
+   * @param userId - The ID of the user.
+   * @param cartItemId - The ID of the cart item.
+   * @returns The updated cart item or null if removed.
+   */
+  async decreaseQuantity(
+    userId: string,
+    cartItemId: string,
+  ): Promise<Cart | null> {
+    try {
+      const cartItem = await this.prisma.cart.findFirst({
+        where: {
+          id: cartItemId,
+          userId,
+        },
+        include: {
+          Product: true,
+        },
+      });
+
+      if (!cartItem) {
+        throw new BadRequestException(
+          `Cart item with id ${cartItemId} not found`,
+        );
+      }
+
+      if (cartItem.quantity <= 1) {
+        // Remove item if quantity would become 0
+        await this.removeFromCart(userId, cartItemId);
+        return null;
+      }
+
+      // Update cart item quantity and total
+      const newQuantity = cartItem.quantity - 1;
+      const newTotal = Number(cartItem.Product.price) * newQuantity;
+
+      const updatedCartItem = await this.prisma.cart.update({
+        where: { id: cartItemId },
+        data: {
+          quantity: newQuantity,
+          total: newTotal,
+        },
+        include: {
+          Product: true,
+        },
+      });
+
+      // Increase product stock
+      await this.prisma.product.update({
+        where: { id: cartItem.productId },
+        data: {
+          stockQuantity: {
+            increment: 1,
+          },
+        },
+      });
+
+      return updatedCartItem;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error decreasing quantity');
+    }
+  }
+
+  /**
+   * Gets the purchase history for a user.
+   * @param userId - The ID of the user.
+   * @returns An array of purchase records.
+   */
+  async getPurchaseHistory(userId: string) {
+    try {
+      const purchases = await this.prisma.purchase.findMany({
+        where: { userId },
+        include: {
+          items: {
+            include: {
+              product: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      return purchases;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+      throw new BadRequestException('Error fetching purchase history');
     }
   }
 }

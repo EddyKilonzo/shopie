@@ -16,15 +16,23 @@
     </div>
 
     <!-- Cart Items -->
-    <div *ngIf="!isLoading && cartItems.length > 0 && !showCheckout" class="cart-items">
+    <div *ngIf="!isLoading && cartItems.length > 0 && !showCheckout && !showHistory" class="cart-items">
       <div *ngFor="let item of cartItems" class="cart-item">
         <div class="item-info">
           <h3>{{ item.productName }}</h3>
-          <p>Quantity: {{ item.quantity }}</p>
+          <div class="quantity-controls">
+            <button class="quantity-btn decrease" (click)="decreaseQuantity(item.id)" [disabled]="isProcessing">
+              -
+            </button>
+            <span class="quantity">{{ item.quantity }}</span>
+            <button class="quantity-btn increase" (click)="increaseQuantity(item.id)" [disabled]="isProcessing">
+              +
+            </button>
+          </div>
           <p class="item-total">Total: KSH {{ item.total | number:'1.2-2' }}</p>
         </div>
         <div class="item-actions">
-          <button class="remove-btn" (click)="removeFromCart(item.id)">
+          <button class="remove-btn" (click)="removeFromCart(item.id)" [disabled]="isProcessing">
             Remove
           </button>
         </div>
@@ -33,8 +41,60 @@
       <div class="cart-summary">
         <h3>Cart Total: KSH {{ cartTotal | number:'1.2-2' }}</h3>
         <p>Total Items: {{ totalItems }}</p>
-        <button class="checkout-btn" (click)="showCheckoutForm()">
-          Proceed to Checkout
+        <div class="cart-actions">
+          <button class="checkout-btn" (click)="showCheckoutForm()" [disabled]="isProcessing">
+            Proceed to Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Purchase History -->
+    <div *ngIf="!isLoading && showHistory" class="purchase-history">
+      <div class="history-header">
+        <div class="history-nav">
+          <button class="nav-btn" (click)="showCart()" [class.active]="!showHistory">
+            Shopping Cart
+          </button>
+          <button class="nav-btn" (click)="showPurchaseHistory()" [class.active]="showHistory">
+            Purchase History
+          </button>
+        </div>
+        <h2>Purchase History</h2>
+      </div>
+
+      <div *ngIf="purchaseHistory.length > 0" class="history-items">
+        <div *ngFor="let purchase of purchaseHistory; let i = index" class="history-item" [class.recent-purchase]="i === 0">
+          <div class="purchase-header">
+            <h3>Order #{{ purchase.id.slice(0, 8) }}</h3>
+            <span class="purchase-date">{{ purchase.createdAt | date:'medium' }}</span>
+            <span class="purchase-status" [class]="purchase.status.toLowerCase()">
+              {{ purchase.status }}
+            </span>
+          </div>
+          <div class="purchase-items">
+            <div class="items-header">
+              <span>Items ({{ purchase.items.length }})</span>
+            </div>
+            <div *ngFor="let item of purchase.items" class="purchase-item">
+              <span>{{ item.productName }} x {{ item.quantity }}</span>
+              <span>KSH {{ item.total | number:'1.2-2' }}</span>
+            </div>
+          </div>
+          <div class="purchase-total">
+            <strong>KSH {{ purchase.totalAmount | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="purchaseHistory.length === 0" class="empty-history">
+        <h3>No purchase history found</h3>
+        <p>Your completed orders will appear here.</p>
+      </div>
+
+      <div class="history-actions">
+        <button class="shop-btn" routerLink="/products">
+          Continue Shopping
         </button>
       </div>
     </div>
@@ -166,12 +226,17 @@
     </div>
 
     <!-- Empty Cart -->
-    <div *ngIf="!isLoading && cartItems.length === 0" class="empty-cart">
+    <div *ngIf="!isLoading && cartItems.length === 0 && !showCheckout && !showHistory" class="empty-cart">
       <h2>Your cart is empty</h2>
       <p>Add some products to your cart to get started!</p>
-      <button class="shop-btn" routerLink="/products">
-        Continue Shopping
-      </button>
+      <div class="empty-cart-actions">
+        <button class="shop-btn" routerLink="/products">
+          Continue Shopping
+        </button>
+        <button *ngIf="purchaseHistory.length > 0" class="history-btn" (click)="showPurchaseHistory()">
+          View Purchase History
+        </button>
+      </div>
     </div>
   </main>
 </div> 

@@ -88,10 +88,12 @@ export class AuthService {
                 this.currentUserSubject.next(null);
                 this.toastService.setCurrentUser(null);
                 this.cartService.clearCartItems();
+                this.cartService.clearPurchaseHistory();
             }
         } else {
             this.toastService.setCurrentUser(null);
             this.cartService.clearCartItems();
+            this.cartService.clearPurchaseHistory();
         }
     }
     /**
@@ -199,6 +201,7 @@ export class AuthService {
         this.currentUserSubject.next(null);
         this.toastService.setCurrentUser(null);
         this.cartService.clearCartItems();
+        this.cartService.clearPurchaseHistory();
     }
     /**
      * This method is used to get the token of the user

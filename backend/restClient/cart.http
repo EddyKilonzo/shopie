@@ -1,6 +1,6 @@
 ### Variables
 @baseUrl = http://localhost:3000
-@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwNjY5YTEyYi0yZTA4LTRjOWQtODljZi0wNTc5YzMwOTU2MTAiLCJlbWFpbCI6ImRlZUBleGFtcGxlLmNvbSIsInJvbGUiOiJDVVNUT01FUiIsImlhdCI6MTc1MDM1NTI2NiwiZXhwIjoxNzUwNDQxNjY2fQ.wyIBLssQra7pYv-wziDEZRSZnI8iYqEwTLw6VNcIGvU
+@authToken = 
 @productId = aff2c450-a00d-41ae-ad7c-6cc7f7abadfe
 
 ## Get all products
@@ -24,14 +24,26 @@ Authorization: Bearer {{authToken}}
 GET {{baseUrl}}/cart/total
 Authorization: Bearer {{authToken}}
 
-### Remove item from cart
-DELETE {{baseUrl}}/cart/cart_item_id
+### Increase quantity of cart item
+POST {{baseUrl}}/cart/your-cart-item-id/increase
 Authorization: Bearer {{authToken}}
 
-### Clear cart
+### Decrease quantity of cart item
+POST {{baseUrl}}/cart/your-cart-item-id/decrease
+Authorization: Bearer {{authToken}}
+
+### Remove item from cart
+DELETE {{baseUrl}}/cart/your-cart-item-id
+Authorization: Bearer {{authToken}}
+
+### Clear all items from cart
 DELETE {{baseUrl}}/cart
 Authorization: Bearer {{authToken}}
 
 ### Checkout and send order confirmation email
 POST {{baseUrl}}/cart/checkout
+Authorization: Bearer {{authToken}}
+
+### Get purchase history
+GET {{baseUrl}}/cart/purchase-history
 Authorization: Bearer {{authToken}} 

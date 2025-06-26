@@ -14,10 +14,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum Role {
   ADMIN
   CUSTOMER
+}
+
+enum PurchaseStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 model User {
@@ -29,9 +36,9 @@ model User {
   resetToken String?
   resetTokenExpiry DateTime?
   carts     Cart[]
+  purchases Purchase[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
 model Product {
@@ -42,9 +49,9 @@ model Product {
   imageUrl  String
   stockQuantity Int @default(0)
   carts     Cart[]
+  purchaseItems PurchaseItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
 model Cart {
@@ -58,6 +65,29 @@ model Cart {
   productId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
+model Purchase {
+  id        String      @id @default(uuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+  status    PurchaseStatus @default(PENDING)
+  totalAmount Decimal
+  items     PurchaseItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PurchaseItem {
+  id        String      @id @default(uuid())
+  purchase  Purchase    @relation(fields: [purchaseId], references: [id])
+  purchaseId String
+  product   Product     @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Decimal
+  productName String
+  total     Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

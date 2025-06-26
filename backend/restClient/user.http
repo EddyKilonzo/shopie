@@ -9,9 +9,9 @@ POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-  "name": "dee ",
-  "email": "dee@example.com",
-  "password": "dee@example.com"
+  "name": "eddy",
+  "email": "eddboy18@gmail.com",
+  "password": "eddboy18@gmail.com"
 }
 
 ### Login
@@ -39,8 +39,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "eddy.new@example.com",
-  "password": "12345678"
+  "email": "admin@example.com",
+  "password": "admin123"
 }
 
 ### Get all users (Admin only)
